@@ -1,4 +1,4 @@
-local debugging
+local is_debugging
 
 local spells_list
 local player_spells_list
@@ -55,7 +55,7 @@ local function zb_initialize_variables()
     hostile_bar_x = -225
     hostile_bar_y = -325
     is_disabled = false
-    debugging = false
+    is_debugging = false
     are_bars_being_cleared = false
     square_size = 45
     count_delay_from_start = 0
@@ -186,11 +186,17 @@ end
 
 local function zb_update_text(bar, index)
     if (bar[index].cooldown > 60) then
+        bar[index].text:SetTextColor(1,1,0,1)
+        bar[index].text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
         bar[index].text:SetText(string.format("%.0fm", floor(bar[index].cooldown/60)))
     elseif (bar[index].cooldown >= 10) then
+        bar[index].text:SetTextColor(1,1,0,1)
+        bar[index].text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
         bar[index].text:SetText(string.format(" %.0f", floor(bar[index].cooldown)))
     else
-        bar[index].text:SetText(string.format("  %.0f", floor(bar[index].cooldown)))
+        bar[index].text:SetTextColor(1,0,0,1)
+        bar[index].text:SetFont(STANDARD_TEXT_FONT,26,"OUTLINE")
+        bar[index].text:SetText(string.format(" %.0f", floor(bar[index].cooldown)))
     end
 end
 
@@ -266,6 +272,7 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid)
 
         local _,_,icon = GetSpellInfo(id)
         bar[length].texture:SetTexture(icon)
+        
         bar[length].cd:SetCooldown(bar[length].start,bar[length].duration)
 
         bar[length]:Show()
@@ -283,7 +290,7 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid)
     count_delay_from_start = GetTime()
     if line[id].is_aura then
         if combat_event == "SPELL_AURA_APPLIED" then
-            return zb_add_icon(bar, length, id, line, true, src_guid)
+            return zb_add_icon(bar, length, id, line, false, src_guid)
         elseif combat_event == "SPELL_AURA_REMOVED" then
             return zb_remove_icon(bar, length, id, true, src_guid)
         elseif combat_event == "SPELL_AURA_REFRESH" then
@@ -293,13 +300,17 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid)
         if combat_event == "SPELL_DAMAGE" and line[id].isDamage then
             return zb_add_icon(bar, length, id, line, false, src_guid)
         elseif combat_event == "SPELL_CAST_SUCCESS" and line[id].is_success then
-            
-            return zb_add_icon(bar, length, id, line, false, src_guid)
-        elseif (combat_event == "SWING_MISSED" and line[id].is_swing) then
             return zb_add_icon(bar, length, id, line, false, src_guid)
         end
     end
     return length
+end
+
+local function zb_is_in_party(dst_guid)
+    if (UnitGUID("party1") or UnitGUID("party2") or UnitGUID("party3") or UnitGUID("party4")) == dst_guid then
+        return true
+    end
+    return false
 end
 
 local function zb_combat_log(event, ...)
@@ -322,34 +333,36 @@ local function zb_combat_log(event, ...)
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
-        elseif bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 then
+        elseif zb_is_in_party(dst_guid) then
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
             end
         end
     end
-    
     if src_guid == player_guid then
-        
-        if player_spells_list[spell_id] and (player_spells_list[spell_id].class == nil or player_spells_list[spell_id].class == player_class) then 
-            
-            if bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 then
+        if player_spells_list[spell_id] then 
+            if zb_is_in_party(dst_guid) then
                 length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid)
             else
-                
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, player_spells_list, src_guid)
             end
-        elseif combat_event == "SWING_MISSED" and not id == "MISS" then
-            for swing_id in pairs(player_spells_list) do
-                if player_spells_list[swing_id].is_swing then
-                    length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, swing_id, player_spells_list, player_guid)
+        elseif combat_event == "SWING_MISSED" then
+            for id in pairs(player_spells_list) do
+                if player_spells_list[id].is_swing and player_spells_list[spell_id].class == player_class then
+                    for swing_type in pairs(player_spells[id].swing_types) do
+                        if swing_type == spell_id then
+                            count_delay_from_start = GetTime()
+                            length_of_player_bar = zb_add_icon(bar, length, id, line, false, src_guid)
+                            return
+                        end
+                    end 
                 end
             end
         end
     elseif spells_list[spell_id] then  
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, spells_list, src_guid)
-        elseif bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 then
+        elseif zb_is_in_party(dst_guid) then
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, spells_list, src_guid)
         end
     end
@@ -375,22 +388,22 @@ local function zb_initialize_bar(bar, bar_x, bar_y)
         button:SetPoint("CENTER",bar,"CENTER",location,0)
         button:SetFrameStrata("LOW")
         
-        
-        
         texture = button:CreateTexture(nil,"BACKGROUND")
         texture:SetAllPoints(true)
         texture:SetTexCoord(0.07,0.9,0.07,0.90) 
 
         cooldown = CreateFrame("Cooldown",nil,button, "CooldownFrameTemplate")
-        cooldown.noomnicc = true
-        cooldown.noCooldownCount = true
         cooldown:SetAllPoints(true)
         cooldown:SetFrameStrata("MEDIUM")
+        cooldown.noomnicc = true
+        cooldown.noCooldownCount = true
+
     
         text = cooldown:CreateFontString(nil,"ARTWORK")
         text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
         text:SetTextColor(1,1,0,1)
         text:SetPoint("LEFT",button,"LEFT",2,0)
+
         button.texture = texture
         button.text = text
         button.cd = cooldown
@@ -444,6 +457,7 @@ local function zb_on_load(self)
         print("ZB loaded.")
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
+        self:RegisterEvent("GROUP_ROSTER_UPDATE")
         zb_initialize_variables()
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y)
         party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y)
@@ -456,6 +470,7 @@ local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
+    ["GROUP_ROSTER_UPDATE"] = function(self) length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar) end,
 }
 
 local function zb_on_event(self,event)
