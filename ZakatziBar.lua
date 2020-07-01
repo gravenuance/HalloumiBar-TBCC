@@ -138,13 +138,12 @@ local function zb_initialize_variables()
 
     player_spells_list = {}
     --Player Spells
-    player_spells_list[1126] = {duration = 1800, is_aura = true}
     player_spells_list[774] = {duration = 12, is_aura = true}
     --End
 
     specs_by_guid_list = {}
     special_spells_list = {}
-    --special_spells_list[0] = 0
+    --special_spells_list[spell_id] = spec_id
 end
 
 local function zb_remove_icon(bar, length, id, is_aura, src_guid)
