@@ -3,5 +3,6 @@
 ## Notes: Pothen eisai re file?
 ## Version: ena point pente re
 ## Author: Rikos
+## DefaultState: Enabled
 
 ZakatziBar.lua
