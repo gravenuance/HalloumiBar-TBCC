@@ -1,0 +1,9 @@
+## Interface: 30300
+## Title: ZakatziBar
+## Notes: Pothen eisai re file?
+## Version: ena point pente re
+## Author: Rikos
+## DefaultState: Enabled
+## SavedVariables: ZakatziBarDB
+
+ZakatziBar.lua
