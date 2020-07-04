@@ -347,7 +347,7 @@ local function zb_combat_log(event, ...)
             end
         elseif combat_event == "SWING_MISSED" then
             for id in pairs(player_spells_list) do
-                if player_spells_list[id].is_swing and player_spells_list[spell_id].class == player_class then
+                if player_spells_list[id].is_swing and (player_spells[id].class == nil or player_spells_list[id].class == player_class) then
                     for swing_type in pairs(player_spells[id].swing_types) do
                         if swing_type == spell_id then
                             count_delay_from_start = GetTime()
