@@ -138,7 +138,7 @@ local function zb_initialize_variables()
 
     player_spells_list = {}
     --Player Spells
-    player_spells_list[774] = {duration = 12, is_aura = true}
+
     --End
 
     specs_by_guid_list = {}
