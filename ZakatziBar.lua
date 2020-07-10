@@ -138,7 +138,7 @@ local function zb_initialize_variables()
 
     player_spells_list = {}
     --Player Spells
-
+    player_spells_list[774] = {duration = 12, is_aura = true}
     --End
 
     specs_by_guid_list = {}
@@ -286,7 +286,6 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid)
 end
 
 local function zb_event_type(combat_event, bar, length, id, line, src_guid)
-    count_delay_from_start = GetTime()
     if line[id].is_aura then
         if combat_event == "SPELL_AURA_APPLIED" then
             return zb_add_icon(bar, length, id, line, false, src_guid)
@@ -305,8 +304,8 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid)
     return length
 end
 
-local function zb_is_in_party(dst_guid)
-    if (UnitGUID("party1") or UnitGUID("party2") or UnitGUID("party3") or UnitGUID("party4")) == dst_guid then
+local function zb_is_in_party_or_raid(flags)
+    if bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 or bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_RAID) > 0 then
         return true
     end
     return false
@@ -316,6 +315,7 @@ local function zb_combat_log(event, ...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_name = select(13, ...)
     local spell_id = select(7, GetSpellInfo(spell_name))
+    count_delay_from_start = GetTime()
     if debugging and (src_guid == (player_guid or UnitGUID("target") or dst_guid == (player_guid or UnitGUID("target")))) then
         print(spell_id)
         print(spell_name)
@@ -332,15 +332,15 @@ local function zb_combat_log(event, ...)
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
-        elseif zb_is_in_party(dst_guid) then
+        elseif zb_is_in_party_or_raid(src_flags) then
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
             end
         end
     end
-    if src_guid == player_guid then
+    if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
         if player_spells_list[spell_id] then 
-            if zb_is_in_party(dst_guid) then
+            if zb_is_in_party_or_raid(dst_flags) then
                 length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid)
             else
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, player_spells_list, src_guid)
@@ -350,7 +350,6 @@ local function zb_combat_log(event, ...)
                 if player_spells_list[id].is_swing and (player_spells_list[id].class == nil or player_spells_list[id].class == player_class) then
                     for swing_type in pairs(player_spells[id].swing_types) do
                         if swing_type == spell_id then
-                            count_delay_from_start = GetTime()
                             length_of_player_bar = zb_add_icon(bar, length, id, line, false, src_guid)
                             return
                         end
@@ -361,7 +360,7 @@ local function zb_combat_log(event, ...)
     elseif spells_list[spell_id] then  
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, spells_list, src_guid)
-        elseif zb_is_in_party(dst_guid) then
+        elseif zb_is_in_party_or_raid(dst_guid) then
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, spells_list, src_guid)
         end
     end
@@ -431,7 +430,6 @@ local function zb_entering_world()
     length_of_player_bar = zb_reset_all(player_bar, length_of_player_bar)
     length_of_hostile_bar = zb_reset_all(hostile_bar, length_of_hostile_bar)
     length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar)
-    zb_clear_spec_list()
     are_bars_being_cleared = false
 end
 
@@ -445,6 +443,7 @@ local function zb_commands(sub_string)
         end
     elseif sub_string == "clear" then
         zb_entering_world()
+        zb_clear_spec_list()
     elseif sub_string == "disable" then
         is_disabled = not is_disabled
     else
