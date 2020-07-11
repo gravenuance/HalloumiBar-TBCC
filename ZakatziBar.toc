@@ -1,8 +1,6 @@
 ## Interface: 11305
 ## Title: ZakatziBar
-## Notes: Pothen eisai re file?
-## Version: ena point pente re
-## Author: Rikos
+## Notes: Inspired by InterruptBar and TellMeWhen
 ## DefaultState: Enabled
 
 ZakatziBar.lua
