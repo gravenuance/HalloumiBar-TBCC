@@ -448,7 +448,7 @@ end
 local function zb_remove_ex_party_member_icons()
     local index = 0
     while index < length_of_party_bar do
-        if (not zb_is_in_party(party_bar[index].src_guid)) then
+        if (not zb_is_in_party(party_bar[index].src_guid) or (party_bar[index].dst_guid and not zb_is_in_party(party_bar[index].dst_guid))) then
             length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
         end
         index = index + 1
@@ -490,7 +490,7 @@ local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
-    ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
+    ["GROUP_ROSTER_UPDATE"] = function(self) zb_add_and_remove_party_and_raid_members() end,
 }
 
 local function zb_on_event(self,event)
