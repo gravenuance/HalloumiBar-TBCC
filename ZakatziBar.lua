@@ -44,10 +44,13 @@ local is_disabled
 
 local player_class
 
+local raid_list
+
 
 local function zb_initialize_variables()
     player_guid = UnitGUID("player")
     _, player_class = UnitClass("player")
+    raid_list = {}
     player_bar_x = -225
     player_bar_y = -225
     party_bar_x = -225
@@ -146,15 +149,17 @@ local function zb_initialize_variables()
     --special_spells_list[spell_id] = spec_id
 end
 
-local function zb_remove_icon(bar, length, id, is_aura, src_guid)
+local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
     if is_aura then
         local index = 1
         local found = false
         while index < length do
-            if bar[index].id == id and src_guid == bar[index].srcGUID then
-                id = index
-                found = true
-                break
+            if bar[index].id == id and src_guid == bar[index].src_guid then
+                if dst_guid and dst_guid == bar[index].dst_guid or not dst_guid then
+                    id = index
+                    found = true
+                    break
+                end
             end
             index = index + 1
         end
@@ -166,7 +171,8 @@ local function zb_remove_icon(bar, length, id, is_aura, src_guid)
     local index = id
     while index < length do
         bar[index].id = bar[index+1].id
-        bar[index].srcGUID = bar[index+1].srcGUID
+        bar[index].src_guid = bar[index+1].src_guid
+        bar[index].dst_guid = bar[index+1].dst_guid
         bar[index].duration = bar[index+1].duration
         bar[index].start = bar[index+1].start
         bar[index].cooldown = bar[index+1].cooldown
@@ -231,7 +237,7 @@ local function zb_on_update(self, elapsed)
     end
 end
 
-local function zb_add_icon(bar, length, id, list, refresh, src_guid)
+local function zb_add_icon(bar, length, id, list, refresh, src_guid, dst_guid)
     local duration = 0;
     if list[id].has_other_duration then
         if specs_by_guid_list[src_guid] then
@@ -248,19 +254,24 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid)
     if refresh then
         local index = 1
         while index < length do
-            if bar[index].id == id and src_guid == bar[index].srcGUID then
-                bar[index].start = get_time*2-count_delay_from_start
-                bar[index].duration = duration
-                bar[index].cooldown = bar[index].start + bar[index].duration - get_time
-                bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
-                zb_update_text(bar, index)
-                return length
+            if bar[index].id == id and src_guid == bar[index].src_guid then
+                    if dst_guid and dst_guid == bar[index].dst_guid or not dst_guid then
+                    bar[index].start = get_time*2-count_delay_from_start
+                    bar[index].duration = duration
+                    bar[index].cooldown = bar[index].start + bar[index].duration - get_time
+                    bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
+                    zb_update_text(bar, index)
+                    return length
+                end
             end
             index = index + 1
         end
     end
     if length < total_buttons then
-        bar[length].srcGUID = src_guid
+        if dst_guid then
+            bar[length].dst_guid = dst_guid
+        end
+        bar[length].src_guid = src_guid
         bar[length].duration = duration
 
         bar[length].start = get_time*2-count_delay_from_start
@@ -285,27 +296,30 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid)
     return length
 end
 
-local function zb_event_type(combat_event, bar, length, id, line, src_guid)
+local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_guid)
     if line[id].is_aura then
         if combat_event == "SPELL_AURA_APPLIED" then
-            return zb_add_icon(bar, length, id, line, false, src_guid)
+            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
         elseif combat_event == "SPELL_AURA_REMOVED" then
-            return zb_remove_icon(bar, length, id, true, src_guid)
+            return zb_remove_icon(bar, length, id, true, src_guid, dst_guid)
         elseif combat_event == "SPELL_AURA_REFRESH" then
-            return zb_add_icon(bar, length, id, line, true, src_guid)
+            return zb_add_icon(bar, length, id, line, true, src_guid, dst_guid)
         end
     else
         if combat_event == "SPELL_DAMAGE" and line[id].isDamage then
-            return zb_add_icon(bar, length, id, line, false, src_guid)
+            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
         elseif combat_event == "SPELL_CAST_SUCCESS" and line[id].is_success then
-            return zb_add_icon(bar, length, id, line, false, src_guid)
+            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
         end
     end
     return length
 end
 
-local function zb_is_in_party_or_raid(flags)
-    if bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 or bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_RAID) > 0 then
+local function zb_is_in_party_or_raid(guid)
+    if (UnitInParty(guid) or UnitInRaid(guid)) and not guid == player_guid  then
+        if not raid_list[guid] then
+            raid_list[guid] = true
+        end
         return true
     end
     return false
@@ -332,7 +346,7 @@ local function zb_combat_log(event, ...)
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
-        elseif zb_is_in_party_or_raid(src_flags) then
+        elseif zb_is_in_party_or_raid(src_guid) then
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
             end
@@ -340,8 +354,8 @@ local function zb_combat_log(event, ...)
     end
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
         if player_spells_list[spell_id] then 
-            if zb_is_in_party_or_raid(dst_flags) then
-                length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid)
+            if zb_is_in_party_or_raid(dst_guid) then
+                length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid, dst_guid)
             else
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, player_spells_list, src_guid)
             end
@@ -360,7 +374,7 @@ local function zb_combat_log(event, ...)
     elseif spells_list[spell_id] then  
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, spells_list, src_guid)
-        elseif zb_is_in_party_or_raid(dst_guid) then
+        elseif zb_is_in_party_or_raid(src_guid) then
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, spells_list, src_guid)
         end
     end
@@ -433,6 +447,19 @@ local function zb_entering_world()
     are_bars_being_cleared = false
 end
 
+local function zb_remove_party_or_raid_member_icons()
+    for member_id in pairs(raid_list) do
+        local index = 0
+        if not zb_is_in_party_or_raid(member_id) then
+            while index < length_of_party_bar do
+                if (party_bar[index].src_guid == member_id) or (party_bar[index].src_guid == player_guid and party_bar[index].dst_guid == member_id) then
+                    length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+                end
+            end
+        end
+    end
+end
+
 local function zb_commands(sub_string)
     if sub_string == "debug" then
         debugging = not debugging
@@ -468,7 +495,7 @@ local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
-    ["GROUP_ROSTER_UPDATE"] = function(self) length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar) end,
+    ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_party_or_raid_member_icons() end,
 }
 
 local function zb_on_event(self,event)
