@@ -44,13 +44,10 @@ local is_disabled
 
 local player_class
 
-local raid_list
-
 
 local function zb_initialize_variables()
     player_guid = UnitGUID("player")
     _, player_class = UnitClass("player")
-    raid_list = {}
     player_bar_x = -225
     player_bar_y = -225
     party_bar_x = -225
@@ -315,12 +312,13 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_
     return length
 end
 
-local function zb_is_in_party_or_raid(guid)
-    if (UnitInParty(guid) or UnitInRaid(guid)) and not guid == player_guid  then
-        if not raid_list[guid] then
-            raid_list[guid] = true
+local function zb_is_in_party(guid)
+    local index = 1
+    while index < 5 do
+        if (UnitGUID("party" .. index) == guid) then
+            return true
         end
-        return true
+        index = index + 1
     end
     return false
 end
@@ -346,7 +344,7 @@ local function zb_combat_log(event, ...)
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
-        elseif zb_is_in_party_or_raid(src_guid) then
+        elseif zb_is_in_party(src_guid) then
             for related_id in pairs(spells_list[spell_id].related) do
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
             end
@@ -354,7 +352,7 @@ local function zb_combat_log(event, ...)
     end
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
         if player_spells_list[spell_id] then 
-            if zb_is_in_party_or_raid(dst_guid) then
+            if zb_is_in_party(dst_guid) then
                 length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid, dst_guid)
             else
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, player_spells_list, src_guid)
@@ -374,7 +372,7 @@ local function zb_combat_log(event, ...)
     elseif spells_list[spell_id] then  
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, spells_list, src_guid)
-        elseif zb_is_in_party_or_raid(src_guid) then
+        elseif zb_is_in_party(src_guid) then
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, spells_list, src_guid)
         end
     end
@@ -447,16 +445,13 @@ local function zb_entering_world()
     are_bars_being_cleared = false
 end
 
-local function zb_remove_party_or_raid_member_icons()
-    for member_id in pairs(raid_list) do
-        local index = 0
-        if not zb_is_in_party_or_raid(member_id) then
-            while index < length_of_party_bar do
-                if (party_bar[index].src_guid == member_id) or (party_bar[index].src_guid == player_guid and party_bar[index].dst_guid == member_id) then
-                    length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
-                end
-            end
+local function zb_remove_ex_party_member_icons()
+    local index = 0
+    while index < length_of_party_bar do
+        if (not zb_is_in_party(party_bar[index].src_guid)) then
+            length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
         end
+        index = index + 1
     end
 end
 
@@ -495,7 +490,7 @@ local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
-    ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_party_or_raid_member_icons() end,
+    ["GROUP_ROSTER_UPDATE"] = function(self) zb_add_and_remove_party_and_raid_members() end,
 }
 
 local function zb_on_event(self,event)
