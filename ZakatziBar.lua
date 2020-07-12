@@ -446,10 +446,16 @@ local function zb_entering_world()
 end
 
 local function zb_remove_ex_party_member_icons()
-    local index = 0
+    local index = 1
     while index < length_of_party_bar do
-        if (not zb_is_in_party(party_bar[index].src_guid) or (party_bar[index].dst_guid and not zb_is_in_party(party_bar[index].dst_guid))) then
-            length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+        if (party_bar[index]["src_guid"]) then
+            if zb_is_in_party(party_bar[index].src_guid) then
+                length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+            end
+        elseif (party_bar[index]["dst_guid"]) then
+            if zb_is_in_party(party_bar[index].dst_guid) then
+                length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+            end
         end
         index = index + 1
     end
