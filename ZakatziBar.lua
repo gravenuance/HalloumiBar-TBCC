@@ -496,7 +496,7 @@ local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
-    ["GROUP_ROSTER_UPDATE"] = function(self) zb_add_and_remove_party_and_raid_members() end,
+    ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
 }
 
 local function zb_on_event(self,event)
