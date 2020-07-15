@@ -411,7 +411,7 @@ local function zb_initialize_bar(bar, bar_x, bar_y)
 
         texture2 = button:CreateTexture(nil,"BACKGROUND", 1)
         texture2:SetAllPoints(button)
-        texture2:SetTexture(0.6,0.2,0.8,0.7)
+        texture2:SetTexture(0.7,0.7,0.7,0.7)
         texture2:SetBlendMode("BLEND")
         button.texture2 = texture2
 
