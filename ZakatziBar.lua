@@ -180,8 +180,10 @@ local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
     end
     bar[length]:Hide()
     bar[length].texture:Hide()
+    bar[length].texture2:Hide()
     bar[length].text:SetText("") 
     bar[length].cd:Hide()
+    bar[length].flasher:Stop()
     return length
 end
 
@@ -213,6 +215,10 @@ local function zb_update_cooldowns(bar, length)
                     index = index - 1
             else 
                 zb_update_text(bar, index)
+                if get_time - bar[index].start >= 1.9 and bar[index].flasher:IsPlaying() then
+                    bar[index].texture2:Hide()
+                    bar[index].flasher:Stop()
+                end
             end
             index = index + 1
         end
@@ -234,7 +240,7 @@ local function zb_on_update(self, elapsed)
     end
 end
 
-local function zb_add_icon(bar, length, id, list, refresh, src_guid, dst_guid)
+local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
     local duration = 0;
     if list[id].has_other_duration then
         if specs_by_guid_list[src_guid] then
@@ -248,21 +254,21 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid, dst_guid)
         duration = list[id].duration
     end
     local get_time = GetTime()
-    if refresh then
-        local index = 1
-        while index < length do
-            if bar[index].id == id and src_guid == bar[index].src_guid then
-                    if dst_guid and dst_guid == bar[index].dst_guid or not dst_guid then
-                    bar[index].start = get_time*2-count_delay_from_start
-                    bar[index].duration = duration
-                    bar[index].cooldown = bar[index].start + bar[index].duration - get_time
-                    bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
-                    zb_update_text(bar, index)
-                    return length
-                end
+    local index = 1
+    while index < length do
+        if bar[index].id == id and src_guid == bar[index].src_guid then
+            if dst_guid and dst_guid == bar[index].dst_guid or not dst_guid then
+                bar[index].start = get_time*2-count_delay_from_start
+                bar[index].duration = duration
+                bar[index].cooldown = bar[index].start + bar[index].duration - get_time
+                bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
+                zb_update_text(bar, index)
+                bar[index].flasher:Play()
+                bar[index].texture2:Show()
+                return length
             end
-            index = index + 1
         end
+        index = index + 1
     end
     if length < total_buttons then
         if dst_guid then
@@ -286,7 +292,8 @@ local function zb_add_icon(bar, length, id, list, refresh, src_guid, dst_guid)
         bar[length].texture:Show()
         bar[length].cd:Show()
         zb_update_text(bar, length)
-
+        bar[length].flasher:Play()
+        bar[index].texture2:Show()
         zb_frame:SetScript("OnUpdate", zb_on_update)
         return length + 1
     end
@@ -296,17 +303,17 @@ end
 local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_guid)
     if line[id].is_aura then
         if combat_event == "SPELL_AURA_APPLIED" then
-            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
+            return zb_add_icon(bar, length, id, line, src_guid, dst_guid)
         elseif combat_event == "SPELL_AURA_REMOVED" then
-            return zb_remove_icon(bar, length, id, true, src_guid, dst_guid)
+            return zb_remove_icon(bar, length, id, src_guid, true, dst_guid)
         elseif combat_event == "SPELL_AURA_REFRESH" then
-            return zb_add_icon(bar, length, id, line, true, src_guid, dst_guid)
+            return zb_add_icon(bar, length, id, line, src_guid, dst_guid)
         end
     else
         if combat_event == "SPELL_DAMAGE" and line[id].isDamage then
-            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
+            return zb_add_icon(bar, length, id, line, src_guid, dst_guid)
         elseif combat_event == "SPELL_CAST_SUCCESS" and line[id].is_success then
-            return zb_add_icon(bar, length, id, line, false, src_guid, dst_guid)
+            return zb_add_icon(bar, length, id, line, src_guid, dst_guid)
         end
     end
     return length
@@ -362,7 +369,7 @@ local function zb_combat_log(event, ...)
                 if player_spells_list[id].is_swing and (player_spells_list[id].class == nil or player_spells_list[id].class == player_class) then
                     for swing_type in pairs(player_spells[id].swing_types) do
                         if swing_type == spell_id then
-                            length_of_player_bar = zb_add_icon(bar, length, id, line, false, src_guid)
+                            length_of_player_bar = zb_add_icon(bar, length, id, line, src_guid)
                             return
                         end
                     end 
@@ -398,9 +405,15 @@ local function zb_initialize_bar(bar, bar_x, bar_y)
         button:SetPoint("CENTER",bar,"CENTER",location,0)
         button:SetFrameStrata("LOW")
         
-        texture = button:CreateTexture(nil,"BACKGROUND")
-        texture:SetAllPoints(true)
+        texture = button:CreateTexture(nil,"BACKGROUND", 0)
+        texture:SetAllPoints()
         texture:SetTexCoord(0.07,0.9,0.07,0.90) 
+
+        texture2 = button:CreateTexture(nil,"BACKGROUND", 1)
+        texture2:SetAllPoints(button)
+        texture2:SetTexture(0.6,0.2,0.8,0.7)
+        texture2:SetBlendMode("BLEND")
+        button.texture2 = texture2
 
         cooldown = CreateFrame("Cooldown",nil,button, "CooldownFrameTemplate")
         cooldown:SetAllPoints(true)
@@ -417,6 +430,24 @@ local function zb_initialize_bar(bar, bar_x, bar_y)
         button.texture = texture
         button.text = text
         button.cd = cooldown
+
+        button.flasher = button:CreateAnimationGroup()
+
+        local fade1 = button.flasher:CreateAnimation("Alpha")
+        fade1:SetDuration(0.5)
+        fade1:SetFromAlpha(1)
+        fade1:SetToAlpha(0.4)
+        fade1:SetOrder(1)
+
+        local fade2 = button.flasher:CreateAnimation("Alpha")
+        fade2:SetDuration(0.5)
+        fade1:SetFromAlpha(0.4)
+        fade1:SetToAlpha(1)
+        fade2:SetOrder(2)
+
+        button.flasher:SetLooping("REPEAT")
+
+        button:Hide()
         bar[index] = button 
         index = index + 1
     end   
@@ -485,9 +516,9 @@ local function zb_on_load(self)
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
         zb_initialize_variables()
-        player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y)
-        party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y)
-        hostile_bar = zb_initialize_bar(hostile_bar, hostile_bar_x, hostile_bar_y)
+        player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
+        party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y, "zb_party")
+        hostile_bar = zb_initialize_bar(hostile_bar, hostile_bar_x, hostile_bar_y, "zb_hostile")
         SlashCmdList["ZAKATZIBAR"] = zb_commands
         SLASH_ZAKATZIBAR1 = "/zb"
 end
