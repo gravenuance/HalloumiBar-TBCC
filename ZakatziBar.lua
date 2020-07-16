@@ -138,7 +138,7 @@ local function zb_initialize_variables()
 
     player_spells_list = {}
     --Player Spells
-    player_spells_list[774] = {duration = 12, is_aura = true}
+    player_spells_list[8940] = {duration = 21, is_aura = true}
     --End
 
     specs_by_guid_list = {}
@@ -416,9 +416,9 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
         icon:SetFrameStrata("LOW")
 
         secondary_icon = CreateFrame("Frame",nil,bar)
-        secondary_icon:SetWidth(square_size)
-        secondary_icon:SetHeight(square_size)
-        secondary_icon:SetPoint("CENTER",bar,"CENTER",location,0)
+        secondary_icon:SetWidth(square_size + 4)
+        secondary_icon:SetHeight(square_size + 4)
+        secondary_icon:SetPoint("CENTER",bar,"CENTER",location-2,-2)
         secondary_icon:SetFrameStrata("LOW")
         icon.secondary_icon = secondary_icon
         icon.is_playing = false
@@ -433,22 +433,41 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
         texture2:SetBlendMode("BLEND")
         secondary_icon.texture = texture2
 
-        cooldown = CreateFrame("Cooldown",nil,icon)
+        cooldown = CreateFrame("Cooldown",nil, icon, "CooldownFrameTemplate")
         cooldown:SetAllPoints()
         cooldown:SetFrameStrata("MEDIUM")
         cooldown.noomnicc = true
-		cooldown.noCooldownCount = true
+        cooldown.noCooldownCount = true
+        
+        -- 
+        local hidden_text = cooldown:GetRegions()
+        hidden_text:SetAlpha(0)
     
         text = cooldown:CreateFontString(nil,"ARTWORK")
         text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
         text:SetTextColor(1,1,0,1)
         text:SetPoint("LEFT",icon,"LEFT",2,0)
+        --
 
         icon.texture = texture
         icon.cd = cooldown
         icon.text = text
 
         icon.flasher = icon:CreateAnimationGroup()
+
+        local fade_out = icon.flasher:CreateAnimation("Alpha")
+        fade_out:SetDuration(0.5)
+        fade_out:SetFromAlpha(1)
+        fade_out:SetToAlpha(0.4)
+        fade_out:SetOrder(1)
+
+        local fade_in = icon.flasher:CreateAnimation("Alpha")
+        fade_in:SetDuration(0.5)
+        fade_in:SetToAlpha(1)
+        fade_in:SetFromAlpha(0.4)
+        fade_in:SetOrder(2)
+
+        icon.flasher:SetLooping("REPEAT")
 
         icon:Hide()
         secondary_icon.texture:Hide()
