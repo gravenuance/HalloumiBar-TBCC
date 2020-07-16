@@ -450,9 +450,9 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
 
         icon.flasher = icon:CreateAnimationGroup()
 
-        button:Hide()
+        icon:Hide()
         secondary_icon.texture:Hide()
-        bar[index] = button 
+        bar[index] = icon 
         index = index + 1
     end   
     return bar
