@@ -179,7 +179,6 @@ local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
         index = index + 1
     end
     bar[length]:Hide()
-    bar[length].secondary_icon.texture:Hide()
     bar[length].flasher:Stop()
     bar[length].is_playing = false
     bar[length].text:SetText("") 
@@ -198,8 +197,8 @@ local function zb_update_text(bar, index)
         bar[index].text:SetText(string.format(" %.0f", floor(bar[index].cooldown)))
     else
         bar[index].text:SetTextColor(1,0,0,1)
-        bar[index].text:SetFont(STANDARD_TEXT_FONT,26,"OUTLINE")
-        bar[index].text:SetText(string.format(" %.0f", floor(bar[index].cooldown)))
+        bar[index].text:SetFont(STANDARD_TEXT_FONT,24,"OUTLINE")
+        bar[index].text:SetText(string.format("  %.0f", floor(bar[index].cooldown)))
     end
 end
 
@@ -215,9 +214,6 @@ local function zb_update_cooldowns(bar, length)
             else 
                 zb_update_text(bar, index)
                 if get_time - bar[index].start >= 1.9 and bar[index].is_playing then
-                    if UnitGUID("target") ~= bar[index].src_guid then  
-                        bar[index].secondary_icon.texture:Hide()
-                    end
                     bar[index].is_playing = false
                     bar[index].flasher:Stop()
                 end
@@ -265,7 +261,6 @@ local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
                 bar[index].cooldown = bar[index].start + bar[index].duration - get_time
                 bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
                 zb_update_text(bar, index)
-                bar[index].secondary_icon.texture:Show()
                 bar[index].flasher:Play()
                 bar[index].is_playing = true
                 return length
@@ -294,7 +289,6 @@ local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
         bar[length].cd:SetCooldown(bar[length].start,bar[length].duration)
 
         bar[length]:Show()
-        bar[length].secondary_icon.texture:Show()
         bar[length].flasher:Play()
         bar[length].is_playing = true
         zb_update_text(bar, length)
@@ -400,7 +394,6 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
     bar.name = name
     local location
     local icon
-    local secondary_icon
     local cooldown
     local texture
     local text
@@ -414,24 +407,11 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
         icon:SetHeight(square_size)
         icon:SetPoint("CENTER",bar,"CENTER",location,0)
         icon:SetFrameStrata("LOW")
-
-        secondary_icon = CreateFrame("Frame",nil,bar)
-        secondary_icon:SetWidth(square_size + 4)
-        secondary_icon:SetHeight(square_size + 4)
-        secondary_icon:SetPoint("CENTER",bar,"CENTER",location-2,-2)
-        secondary_icon:SetFrameStrata("LOW")
-        icon.secondary_icon = secondary_icon
-        icon.is_playing = false
         
-        texture = icon:CreateTexture(nil,"BACKGROUND", 0)
+        texture = icon:CreateTexture(nil,"BACKGROUND")
         texture:SetAllPoints()
         texture:SetTexCoord(0.07,0.9,0.07,0.90) 
 
-        texture2 = icon:CreateTexture(nil,"BACKGROUND", 1)
-        texture2:SetAllPoints(icon)
-        texture2:SetTexture(0.7,0.7,0.7,0.4)
-        texture2:SetBlendMode("BLEND")
-        secondary_icon.texture = texture2
 
         cooldown = CreateFrame("Cooldown",nil, icon, "CooldownFrameTemplate")
         cooldown:SetAllPoints()
@@ -468,9 +448,9 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
         fade_in:SetOrder(2)
 
         icon.flasher:SetLooping("REPEAT")
+        icon.is_playing = false
 
         icon:Hide()
-        secondary_icon.texture:Hide()
         bar[index] = icon 
         index = index + 1
     end   
@@ -497,43 +477,6 @@ local function zb_entering_world()
     length_of_hostile_bar = zb_reset_all(hostile_bar, length_of_hostile_bar)
     length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar)
     are_bars_being_cleared = false
-end
-
-local function zb_change_highlights()
-    local tar_guid = UnitGUID("target")
-    local index = 1
-    while index < length_of_party_bar do
-        if(party_bar[index].src_guid == tar_guid and tar_guid ~= player_guid ) then
-            party_bar[index].secondary_icon.texture:Show()
-        elseif(party_bar[index].src_guid == player_guid and party_bar[index].dst_guid == tar_guid) then
-            party_bar[index].secondary_icon.texture:Show()
-        elseif(party_bar[index].is_playing == false) then
-            party_bar[index].secondary_icon.texture:Hide()
-        end
-        index = index + 1
-    end
-    index = 1
-    while index < length_of_hostile_bar do
-
-        if(hostile_bar[index].src_guid == tar_guid) then
-            hostile_bar[index].secondary_icon.texture:Show()
-        elseif(hostile_bar[index].is_playing == false) then
-            hostile_bar[index].secondary_icon.texture:Hide()
-        end
-
-        index = index + 1
-    end
-    index = 1
-    while index < length_of_player_bar do
-
-        if(player_bar[index].src_guid == tar_guid) then
-            player_bar[index].secondary_icon.texture:Show()
-        elseif(player_bar[index].is_playing == false) then
-            player_bar[index].secondary_icon.texture:Hide()
-        end
-
-        index = index + 1
-    end
 end
 
 local function zb_remove_ex_party_member_icons()
@@ -575,7 +518,6 @@ local function zb_on_load(self)
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
-        self:RegisterEvent("PLAYER_TARGET_CHANGED")
         zb_initialize_variables()
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
         party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y, "zb_party")
@@ -589,7 +531,6 @@ local event_handler = {
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
     ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
-    ["PLAYER_TARGET_CHANGED"] = function(self) zb_change_highlights() end,
 }
 
 local function zb_on_event(self,event)
