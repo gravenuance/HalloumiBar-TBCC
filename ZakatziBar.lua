@@ -5,9 +5,11 @@ local player_spells_list
 -- Tracks the specs of other players based on spec spells
 local special_spells_list
 local specs_by_guid_list
+-- Track all or target/focus
+local all
 
 -- Number of buttons to spawn per bar
-local total_buttons
+local total_icons_per_bar
 -- How many active buttons?
 local length_of_hostile_bar
 local length_of_party_bar
@@ -38,8 +40,6 @@ local party_bar_y
 local hostile_bar_x
 local hostile_bar_y
 
-local are_bars_being_cleared
-
 local is_disabled
 
 local player_class
@@ -48,21 +48,25 @@ local player_class
 local function zb_initialize_variables()
     player_guid = UnitGUID("player")
     _, player_class = UnitClass("player")
+
+    all = true
+    
     player_bar_x = -225
     player_bar_y = -225
     party_bar_x = -225
     party_bar_y = -275
     hostile_bar_x = -225
     hostile_bar_y = -325
+    square_size = 45
+
     is_disabled = false
     is_debugging = false
-    are_bars_being_cleared = false
-    square_size = 45
+    
     count_delay_from_start = 0
     update_interval = 0.1
     total_time_elapsed = 0
     
-    total_buttons = 15
+    total_icons_per_bar = 15
     length_of_hostile_bar = 1
     length_of_party_bar = 1
     length_of_player_bar = 1
@@ -138,12 +142,10 @@ local function zb_initialize_variables()
 
     player_spells_list = {}
     --Player Spells
-    player_spells_list[8940] = {duration = 21, is_aura = true}
     --End
 
     specs_by_guid_list = {}
     special_spells_list = {}
-    --special_spells_list[spell_id] = spec_id
 end
 
 local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
@@ -202,15 +204,38 @@ local function zb_update_text(bar, index)
     end
 end
 
-local function zb_update_cooldowns(bar, length)
+local function zb_get_duration(list, id)
+    if list[id].has_other_duration then
+        if specs_by_guid_list[src_guid] then
+            if (list[id].duration[specs_by_guid_list[src_guid]]) then
+                duration = list[id].duration[specs_by_guid_list[src_guid]]
+            end
+        else
+            return list[id].duration[1]
+        end
+    else
+        return list[id].duration
+    end
+end
+
+local function zb_update_cooldowns(bar, length, list)
     if length > 1 then
         local index = 1
         local get_time = GetTime()
         while index < length do
             bar[index].cooldown = bar[index].start + bar[index].duration - get_time
             if bar[index].cooldown <= 0 then
+                if list[bar[index].id].has_charges and bar[index].has_charges < list[bar[index].id].has_charges then
+                    bar[index].has_charges = bar[index].has_charges + 1
+                    bar[index].start = get_time
+                    bar[index].duration = zb_get_duration(list, bar[index].id)
+                    bar[index].cooldown = bar[index].duration
+                    bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
+                    zb_update_text(bar, index)
+                else
                     length = zb_remove_icon(bar, length, index, false)
                     index = index - 1
+                end
             else 
                 zb_update_text(bar, index)
                 if get_time - bar[index].start >= 1.9 and bar[index].is_playing then
@@ -231,36 +256,28 @@ local function zb_on_update(self, elapsed)
             zb_frame:SetScript("OnUpdate",nil)
             return
         end
-        length_of_player_bar = zb_update_cooldowns(player_bar, length_of_player_bar)
-        length_of_hostile_bar = zb_update_cooldowns(hostile_bar, length_of_hostile_bar)
-        length_of_party_bar = zb_update_cooldowns(party_bar, length_of_party_bar)
+        length_of_player_bar = zb_update_cooldowns(player_bar, length_of_player_bar, player_spells_list)
+        length_of_hostile_bar = zb_update_cooldowns(hostile_bar, length_of_hostile_bar, spells_list)
+        length_of_party_bar = zb_update_cooldowns(party_bar, length_of_party_bar, spells_list)
         total_time_elapsed = 0
     end
 end
 
 local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
-    local duration = 0;
-    if list[id].has_other_duration then
-        if specs_by_guid_list[src_guid] then
-            if (list[id].duration[specs_by_guid_list[src_guid]]) then
-                duration = list[id].duration[specs_by_guid_list[src_guid]]
-            end
-        else
-            duration = list[id].duration[1]
-        end
-    else
-        duration = list[id].duration
-    end
     local get_time = GetTime()
     local index = 1
     while index < length do
         if bar[index].id == id and src_guid == bar[index].src_guid then
             if dst_guid and dst_guid == bar[index].dst_guid or bar[index].dst_guid == nil then
-                bar[index].start = get_time*2-count_delay_from_start
-                bar[index].duration = duration
-                bar[index].cooldown = bar[index].start + bar[index].duration - get_time
-                bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
-                zb_update_text(bar, index)
+                if list[id].has_charges and bar[index].has_charges > 0 then
+                    bar[index].has_charges = bar[index].has_charges - 1
+                else
+                    bar[index].start = get_time*2-count_delay_from_start
+                    bar[index].duration = zb_get_duration(list, id)
+                    bar[index].cooldown = bar[index].start + bar[index].duration - get_time
+                    bar[index].cd:SetCooldown(bar[index].start,bar[index].duration)
+                    zb_update_text(bar, index)
+                end
                 bar[index].flasher:Play()
                 bar[index].is_playing = true
                 return length
@@ -268,14 +285,17 @@ local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
         end
         index = index + 1
     end
-    if length < total_buttons then
+    if length < total_icons_per_bar then
         if dst_guid then
             bar[length].dst_guid = dst_guid
         else
             bar[length].dst_guid = nil
         end
+        if list[id].has_charges then
+            bar[length].has_charges = list[id].has_charges - 1
+        end
         bar[length].src_guid = src_guid
-        bar[length].duration = duration
+        bar[length].duration = zb_get_duration(list, id)
 
         bar[length].start = get_time*2-count_delay_from_start
         bar[length].cooldown = bar[length].start + bar[length].duration - get_time
@@ -335,12 +355,12 @@ local function zb_combat_log(event, ...)
     local spell_name = select(13, ...)
     local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
-    if debugging and (src_guid == (player_guid or UnitGUID("target") or dst_guid == (player_guid or UnitGUID("target")))) then
+    if is_debugging and (src_guid == (player_guid or UnitGUID("target"))) then
         print(spell_id)
         print(spell_name)
         print(combat_event)
     end
-    if are_bars_being_cleared or is_disabled then
+    if is_disabled or (not all and src_guid == (player_guid or UnitGUID("target"))) then
         return
     end
     if special_spells_list[spell_id] then
@@ -398,7 +418,7 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
     local texture
     local text
     local index = 1
-    while index < total_buttons do
+    while index < total_icons_per_bar do
         
         location = square_size * index + 5 * index
 
@@ -472,11 +492,9 @@ local function zb_reset_all(bar, length)
 end
 
 local function zb_entering_world()
-    are_bars_being_cleared = true
     length_of_player_bar = zb_reset_all(player_bar, length_of_player_bar)
     length_of_hostile_bar = zb_reset_all(hostile_bar, length_of_hostile_bar)
     length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar)
-    are_bars_being_cleared = false
 end
 
 local function zb_remove_ex_party_member_icons()
@@ -497,8 +515,8 @@ end
 
 local function zb_commands(sub_string)
     if sub_string == "debug" then
-        debugging = not debugging
-        if debugging then
+        is_debugging = not is_debugging
+        if is_debugging then
             print("Debugging on.")
         else 
             print("Debugging off.")
@@ -508,8 +526,10 @@ local function zb_commands(sub_string)
         zb_clear_spec_list()
     elseif sub_string == "disable" then
         is_disabled = not is_disabled
+    elseif sub_string == "all" then
+        all = not all
     else
-        print("You can only 'clear', 'debug' and 'disable'.")
+        print("Available commands: Debug, clear, disable, all.")
     end
 end
 
