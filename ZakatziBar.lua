@@ -1,9 +1,7 @@
+local addonName, addonTable = ...
+
 local is_debugging
 
-local spells_list
-local player_spells_list
--- Tracks the specs of other players based on spec spells
-local special_spells_list
 local specs_by_guid_list
 -- Track all or target/focus
 local all
@@ -44,6 +42,10 @@ local is_disabled
 
 local player_class
 
+local active_spells
+
+local party_guid
+
 
 local function zb_initialize_variables()
     player_guid = UnitGUID("player")
@@ -71,81 +73,9 @@ local function zb_initialize_variables()
     length_of_party_bar = 1
     length_of_player_bar = 1
 
-    spells_list = {}
-    -- Spells
-    -- Warrior
-    spells_list[1719] = {duration = 1800, is_success = true} -- Recklessness
-    spells_list[12809] = {duration = 45, is_success = true } -- Concussion Blow
-    spells_list[20230] = {duration = 1800, is_success = true} -- Retaliation
-    spells_list[72] = {duration = 12, is_success = true} -- Shield Bash
-    spells_list[871] = {duration = 1800, is_success = true} -- Shield Wall
-    spells_list[6552] = {duration = 10, is_success = true} -- Pummel
-    spells_list[18499] = {duration=30, is_success=true} -- Berserker Rage
-    spells_list[12328] = {duration=180, is_success=true} -- Death Wish
-    -- Paladin
-    spells_list[20066] = {duration=60, is_success=true} -- Repentance
-    spells_list[498] = {duration=300, is_success=true} -- Divine Protection
-    spells_list[853] = {duration=45, is_success=true} -- Hammer of Justice
-    spells_list[1022] = {duration=180, is_success=true} -- Blessing of Protection
-    spells_list[1044] = {duration=20, is_success=true} -- Blessing of Freedom
-    -- Rogue
-    spells_list[11286] = {duration=10, is_success=true} -- Gouge
-    spells_list[1769] = {duration=10, is_success=true} -- Kick
-    spells_list[408] = {duration=20, is_success=true} -- Kidney Shot
-    spells_list[2983] = {duration=180, is_success=true} -- Sprint
-    spells_list[13877] = {duration=120, is_success=true} -- Blade Flurry
-    spells_list[14278] = {duration=20, is_success=true} -- Ghostly Strike
-    spells_list[2094] = {duration=180, is_success=true} -- Blind
-    spells_list[14183] = {duration=120, is_success=true} -- Premeditation
-    spells_list[5277] = {duration=180, is_success=true} -- Evasion
-    spells_list[13750] = {duration=300, is_success=true} -- Adrenaline Rush
-    spells_list[14185] = {duration = 600, related = {13750, 5277, 14183, 2094, 14278, 11286, 1769, 408, 2983, 13877}, is_success = true} -- Preparation
-    -- Priest
-    spells_list[10060] = {duration=180, is_success=true} -- Power Infusion
-    spells_list[15487] = {duration=45, is_success=true} -- Silence
-    spells_list[8122] = {duration=26, is_success=true} -- Psychic Scream
-    --Mage
-    spells_list[543] = {duration=30, is_success=true} -- Fire Ward
-    spells_list[11958] = {duration=300, is_success=true} -- Ice Block
-    spells_list[122] = {duration=21, is_success=true} -- Frost Nova
-    spells_list[6143] = {duration=30, is_success=true} -- Frost Ward
-    spells_list[2139] = {duration=30, is_success=true} -- Counterspell
-    spells_list[11426] = {duration=30, is_success=true} -- Ice Barrier
-    spells_list[12042] = {duration=180, is_success=true} -- Arcane Power
-    spells_list[12051] = {duration=420, is_success=true} -- Evocation
-    spells_list[12472] = {duration = 600, related = {11958, 122, 6143, 11426}, is_success = true} -- COLD SNAP
-    -- Warlock
-    spells_list[6229] = {duration=30, is_success=true} -- Shadow Ward
-    spells_list[6789] = {duration=102, is_success=true} -- Death Coil
-    spells_list[5484] = {duration=40, is_success=true} -- Howl of Terror
-    spells_list[19244] = {duration=30, is_success=true} -- Spell Lock
-    -- Shaman
-    spells_list[8042] = {duration=5, is_success=true} -- Earth Shock
-    spells_list[8177] = {duration=13, is_success=true} -- Grounding Totem
-    spells_list[16188] = {duration=180, is_success=true} -- Nature's Swiftness
-    -- Druid
-    spells_list[5211] = {duration=60, is_success=true} -- Bash
-    spells_list[1850] = {duration=300, is_success=true} -- Dash
-    spells_list[16979] = {duration=15, is_success=true} -- Feral Charge
-    spells_list[29166] = {duration=360, is_success=true} -- Innervate
-    spells_list[16689] = {duration=60, is_success=true} -- Nature's Grasp
-    spells_list[22812] = {duration=60, is_success=true} -- Barkskin
-    -- Hunter
-    spells_list[19574] = {duration=120, is_success=true} -- Bestial Wrath
-    spells_list[19503] = {duration=30, is_success=true} -- Scatter Shot
-    spells_list[25999] = {duration=25, is_success=true} -- Boar Charge
-    spells_list[3045] = {duration=180, is_success=true} -- Rapid Fire
-    spells_list[19263] = {duration=300, is_success=true} -- Deterrence
-    spells_list[19386] = {duration=120, is_success=true} -- Wyvern Sting
-    spells_list[1499] = {duration=15, is_success=true} -- Freezing Trap
-    -- End
-
-    player_spells_list = {}
-    --Player Spells
-    --End
-
     specs_by_guid_list = {}
-    special_spells_list = {}
+    active_spells = {}
+    party_guid = {}
 end
 
 local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
@@ -256,12 +186,13 @@ local function zb_on_update(self, elapsed)
             zb_frame:SetScript("OnUpdate",nil)
             return
         end
-        length_of_player_bar = zb_update_cooldowns(player_bar, length_of_player_bar, player_spells_list)
-        length_of_hostile_bar = zb_update_cooldowns(hostile_bar, length_of_hostile_bar, spells_list)
-        length_of_party_bar = zb_update_cooldowns(party_bar, length_of_party_bar, spells_list)
+        length_of_player_bar = zb_update_cooldowns(player_bar, length_of_player_bar, addonTable.player_spells_list)
+        length_of_hostile_bar = zb_update_cooldowns(hostile_bar, length_of_hostile_bar, addonTable.spells_list)
+        length_of_party_bar = zb_update_cooldowns(party_bar, length_of_party_bar, addonTable.spells_list)
         total_time_elapsed = 0
     end
 end
+
 
 local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
     local get_time = GetTime()
@@ -339,7 +270,7 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_
     return length
 end
 
-local function zb_is_in_party(guid)
+local function zb_is_in_party_alternate(guid)
     local index = 1
     while index < 5 do
         if (UnitGUID("party" .. index) == guid) then
@@ -350,45 +281,53 @@ local function zb_is_in_party(guid)
     return false
 end
 
+local function zb_is_in_party(guid)
+    if party_guid[guid] then
+        return true
+    end
+    return false
+end
+
 local function zb_combat_log(event, ...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
-    local spell_name = select(13, ...)
+    local spell_type, spell_name = select(12, ...)
     local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
     if is_debugging and (src_guid == (player_guid or UnitGUID("target"))) then
         print(spell_id)
         print(spell_name)
         print(combat_event)
+        print(spell_type)
     end
     if is_disabled or (not all and src_guid == (player_guid or UnitGUID("target"))) then
         return
     end
-    if special_spells_list[spell_id] then
-        specs_by_guid_list[src_guid] = special_spells_list[spell_id]
+    if addonTable.special_spells_list[spell_id] then
+        specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
     if spell_id == 14185 or spell_id == 11958 then
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-            for related_id in pairs(spells_list[spell_id].related) do
+            for related_id in pairs(addonTable.spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
         elseif zb_is_in_party(src_guid) then
-            for related_id in pairs(spells_list[spell_id].related) do
+            for related_id in pairs(addonTable.spells_list[spell_id].related) do
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
             end
         end
     end
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-        if player_spells_list[spell_id] then 
+        if addonTable.player_spells_list[spell_id] then 
             if zb_is_in_party(dst_guid) then
-                length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, player_spells_list, src_guid, dst_guid)
+                length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.player_spells_list, src_guid, dst_guid)
             else
-                length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, player_spells_list, src_guid)
+                length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, addonTable.player_spells_list, src_guid)
             end
         elseif combat_event == "SWING_MISSED" then
-            for id in pairs(player_spells_list) do
-                if player_spells_list[id].is_swing and (player_spells_list[id].class == nil or player_spells_list[id].class == player_class) then
+            for id in pairs(addonTable.player_spells_list) do
+                if addonTable.player_spells_list[id].is_swing and (addonTable.player_spells_list[id].class == nil or addonTable.player_spells_list[id].class == player_class) then
                     for swing_type in pairs(player_spells[id].swing_types) do
-                        if swing_type == spell_id then
+                        if swing_type == spell_type then
                             length_of_player_bar = zb_add_icon(bar, length, id, line, src_guid)
                             return
                         end
@@ -396,11 +335,11 @@ local function zb_combat_log(event, ...)
                 end
             end
         end
-    elseif spells_list[spell_id] then  
+    elseif addonTable.spells_list[spell_id] then  
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-            length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, spells_list, src_guid)
+            length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
         elseif zb_is_in_party(src_guid) then
-            length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, spells_list, src_guid)
+            length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.spells_list, src_guid)
         end
     end
 end
@@ -501,11 +440,11 @@ local function zb_remove_ex_party_member_icons()
     local index = 1
     while index < length_of_party_bar do
         if (party_bar[index]["src_guid"]) then
-            if zb_is_in_party(party_bar[index].src_guid) then
+            if zb_is_in_party_alternate(party_bar[index].src_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
         elseif (party_bar[index]["dst_guid"]) then
-            if zb_is_in_party(party_bar[index].dst_guid) then
+            if zb_is_in_party_alternate(party_bar[index].dst_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
         end
