@@ -8,8 +8,5 @@ if (calc_version_uno ~= 1 or calc_version_dos > 10000) return end
 addonTable.spells_list = {
 
 }
-    
 
-addonTable.player_spells_list = {}
-
-addonTable.special_spells_list = {}
+addonTable.swing_spells = {}

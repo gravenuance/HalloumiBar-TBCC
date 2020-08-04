@@ -1,82 +1,47 @@
 local addonName, addonTable = ...
 
-local is_debugging
+local is_debugging = false
 
-local specs_by_guid_list
+local specs_by_guid_list = {}
 -- Track all or target/focus
-local all
+local track_all = true
 
 -- Number of buttons to spawn per bar
-local total_icons_per_bar
+local total_icons_per_bar = 15
 -- How many active buttons?
-local length_of_hostile_bar
-local length_of_party_bar
-local length_of_player_bar
+local length_of_hostile_bar = 1
+local length_of_party_bar = 1
+local length_of_player_bar = 1
 -- Button bars
 local hostile_bar
 local party_bar
 local player_bar
 
 -- Delay for more accurate tracking
-local count_delay_from_start
+local count_delay_from_start = 0
 
 -- Size of side of square
-local square_size
+local square_size = 45
 
 -- How often on_update runs
-local update_interval
-local total_time_elapsed
+local update_interval = 0.1
+local total_time_elapsed = 0
 
 --Player identifier
-local player_guid
+local player_guid = UnitGUID("player")
+local player_class = select(2, UnitClass("player"))
 
 --Bar locations
-local player_bar_x
-local player_bar_y
-local party_bar_x
-local party_bar_y
-local hostile_bar_x
-local hostile_bar_y
+local player_bar_x = -225
+local player_bar_y = -225
+local party_bar_x = -225
+local party_bar_y = -275
+local hostile_bar_x = -225
+local hostile_bar_y = -325
 
-local is_disabled
+local is_disabled = false
 
-local player_class
-
-local active_spells
-
-local party_guid
-
-
-local function zb_initialize_variables()
-    player_guid = UnitGUID("player")
-    _, player_class = UnitClass("player")
-
-    all = true
-    
-    player_bar_x = -225
-    player_bar_y = -225
-    party_bar_x = -225
-    party_bar_y = -275
-    hostile_bar_x = -225
-    hostile_bar_y = -325
-    square_size = 45
-
-    is_disabled = false
-    is_debugging = false
-    
-    count_delay_from_start = 0
-    update_interval = 0.1
-    total_time_elapsed = 0
-    
-    total_icons_per_bar = 15
-    length_of_hostile_bar = 1
-    length_of_party_bar = 1
-    length_of_player_bar = 1
-
-    specs_by_guid_list = {}
-    active_spells = {}
-    party_guid = {}
-end
+local party_guid = {}
 
 local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
     if is_aura then
@@ -193,7 +158,6 @@ local function zb_on_update(self, elapsed)
     end
 end
 
-
 local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
     local get_time = GetTime()
     local index = 1
@@ -288,7 +252,7 @@ local function zb_is_in_party(guid)
     return false
 end
 
-local function zb_combat_log(event, ...)
+local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_type, spell_name = select(12, ...)
     local spell_id = select(7, GetSpellInfo(spell_name))
@@ -299,13 +263,13 @@ local function zb_combat_log(event, ...)
         print(combat_event)
         print(spell_type)
     end
-    if is_disabled or (not all and src_guid == (player_guid or UnitGUID("target"))) then
+    if is_disabled or (not track_all and src_guid == (player_guid or UnitGUID("target"))) then
         return
     end
-    if addonTable.special_spells_list[spell_id] then
+    if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].is_special_spell then
         specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
-    if spell_id == 14185 or spell_id == 11958 then
+    if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].related then
         if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
@@ -317,16 +281,16 @@ local function zb_combat_log(event, ...)
         end
     end
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-        if addonTable.player_spells_list[spell_id] then 
+        if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 1) > 0 then 
             if zb_is_in_party(dst_guid) then
                 length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.player_spells_list, src_guid, dst_guid)
             else
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, addonTable.player_spells_list, src_guid)
             end
         elseif combat_event == "SWING_MISSED" then
-            for id in pairs(addonTable.player_spells_list) do
-                if addonTable.player_spells_list[id].is_swing and (addonTable.player_spells_list[id].class == nil or addonTable.player_spells_list[id].class == player_class) then
-                    for swing_type in pairs(player_spells[id].swing_types) do
+            for id in pairs(addonTable.swing_spells) do
+                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == player_class) then
+                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
                         if swing_type == spell_type then
                             length_of_player_bar = zb_add_icon(bar, length, id, line, src_guid)
                             return
@@ -334,11 +298,13 @@ local function zb_combat_log(event, ...)
                     end 
                 end
             end
-        end
-    elseif addonTable.spells_list[spell_id] then  
-        if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-            length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
-        elseif zb_is_in_party(src_guid) then
+        end  
+    elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
+            if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 2) > 0 then 
+                length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
+            end
+    elseif zb_is_in_party(src_guid) then
+        if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 4) > 0 then 
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.spells_list, src_guid)
         end
     end
@@ -439,12 +405,12 @@ end
 local function zb_remove_ex_party_member_icons()
     local index = 1
     while index < length_of_party_bar do
-        if (party_bar[index]["src_guid"]) then
-            if zb_is_in_party_alternate(party_bar[index].src_guid) then
+        if (party_bar[index].src_guid) then
+            if not zb_is_in_party_alternate(party_bar[index].src_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
-        elseif (party_bar[index]["dst_guid"]) then
-            if zb_is_in_party_alternate(party_bar[index].dst_guid) then
+        elseif (party_bar[index].dst_guid and party_bar[index].src_guid == player_guid) then
+            if not zb_is_in_party_alternate(party_bar[index].dst_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
         end
@@ -466,7 +432,12 @@ local function zb_commands(sub_string)
     elseif sub_string == "disable" then
         is_disabled = not is_disabled
     elseif sub_string == "all" then
-        all = not all
+        track_all = not track_all
+        if track_all then
+            print("Tracking everyone.")
+        else 
+            print("Tracking target.")
+        end
     else
         print("Available commands: Debug, clear, disable, all.")
     end
@@ -477,7 +448,6 @@ local function zb_on_load(self)
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
-        zb_initialize_variables()
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
         party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y, "zb_party")
         hostile_bar = zb_initialize_bar(hostile_bar, hostile_bar_x, hostile_bar_y, "zb_hostile")
@@ -488,7 +458,7 @@ end
 local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
-    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, event) zb_combat_log(event, CombatLogGetCurrentEventInfo()) end,
+    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
     ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
 }
 
