@@ -270,7 +270,11 @@ local function zb_combat_log(...)
         specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
     if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].related then
-        if bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
+        if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
+            for related_id in pairs(addonTable.spells_list[spell_id].related) do
+                length_of_player_bar = zb_remove_icon(player_bar, length_of_player_bar, related_id, true, src_guid)
+            end
+        elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
                 length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
             end
