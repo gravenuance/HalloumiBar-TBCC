@@ -289,10 +289,10 @@ local function zb_combat_log(...)
             end
         elseif combat_event == "SWING_MISSED" then
             for id in pairs(addonTable.swing_spells) do
-                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == player_class) then
+                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
                     for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
                         if swing_type == spell_type then
-                            length_of_player_bar = zb_add_icon(bar, length, id, line, src_guid)
+                            length_of_player_bar = zb_add_icon(player_bar, length_of_player_bar, id, addonTable.swing_spells, src_guid)
                             return
                         end
                     end 
@@ -300,13 +300,35 @@ local function zb_combat_log(...)
             end
         end  
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-            if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 2) > 0 then 
-                length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
+        if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 2) > 0 then 
+            length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
+        elseif combat_event == "SWING_MISSED" then
+            for id in pairs(addonTable.swing_spells) do
+                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
+                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
+                        if swing_type == spell_type then
+                            length_of_hostile_bar = zb_add_icon(hostile_bar, length_of_hostile_bar, id, addonTable.swing_spells, src_guid)
+                            return
+                        end
+                    end 
+                end
             end
+        end 
     elseif zb_is_in_party(src_guid) then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 4) > 0 then 
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.spells_list, src_guid)
-        end
+        elseif combat_event == "SWING_MISSED" then
+            for id in pairs(addonTable.swing_spells) do
+                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
+                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
+                        if swing_type == spell_type then
+                            length_of_party_bar = zb_add_icon(party_bar, length_of_party_bar, id, addonTable.swing_spells, src_guid)
+                            return
+                        end
+                    end 
+                end
+            end
+        end 
     end
 end
 
