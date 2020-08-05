@@ -237,20 +237,13 @@ local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_
     return length
 end
 
-local function zb_is_in_party_alternate(guid)
+local function zb_is_in_party(guid)
     local index = 1
     while index < 5 do
         if (UnitGUID("party" .. index) == guid) then
             return true
         end
         index = index + 1
-    end
-    return false
-end
-
-local function zb_is_in_party(guid)
-    if party_guid[guid] then
-        return true
     end
     return false
 end
@@ -438,11 +431,11 @@ local function zb_remove_ex_party_member_icons()
     local index = 1
     while index < length_of_party_bar do
         if (party_bar[index].src_guid) then
-            if not zb_is_in_party_alternate(party_bar[index].src_guid) then
+            if not zb_is_in_party(party_bar[index].src_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
         elseif (party_bar[index].dst_guid and party_bar[index].src_guid == player_guid) then
-            if not zb_is_in_party_alternate(party_bar[index].dst_guid) then
+            if not zb_is_in_party(party_bar[index].dst_guid) then
                 length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
             end
         end
