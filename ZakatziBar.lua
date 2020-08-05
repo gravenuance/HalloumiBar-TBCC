@@ -265,6 +265,18 @@ local function zb_update_arena_specs()
     end
 end
 
+local function zb_handle_swing_events(bar, length, spell_type, src_guid, dst_guid)
+    for id in pairs(addonTable.swing_spells) do
+        if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
+            for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
+                if swing_type == spell_type then
+                    return zb_add_icon(bar, length, id, addonTable.swing_spells, src_guid)
+                end
+            end 
+        end
+    end
+end
+
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_type, spell_name = select(12, ...)
@@ -305,46 +317,19 @@ local function zb_combat_log(...)
                 length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, addonTable.player_spells_list, src_guid)
             end
         elseif combat_event == "SWING_MISSED" then
-            for id in pairs(addonTable.swing_spells) do
-                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
-                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
-                        if swing_type == spell_type then
-                            length_of_player_bar = zb_add_icon(player_bar, length_of_player_bar, id, addonTable.swing_spells, src_guid)
-                            return
-                        end
-                    end 
-                end
-            end
+            length_of_player_bar = zb_handle_swing_events(player_bar, length_of_player_bar, spell_type, src_guid)
         end  
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 2) > 0 then 
             length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
         elseif combat_event == "SWING_MISSED" then
-            for id in pairs(addonTable.swing_spells) do
-                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
-                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
-                        if swing_type == spell_type then
-                            length_of_hostile_bar = zb_add_icon(hostile_bar, length_of_hostile_bar, id, addonTable.swing_spells, src_guid)
-                            return
-                        end
-                    end 
-                end
-            end
+            length_of_hostile_bar = zb_handle_swing_events(hostile_bar, length_of_hostile_bar, spell_type, src_guid)
         end 
     elseif zb_is_in_party(src_guid) then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 4) > 0 then 
             length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.spells_list, src_guid)
         elseif combat_event == "SWING_MISSED" then
-            for id in pairs(addonTable.swing_spells) do
-                if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
-                    for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
-                        if swing_type == spell_type then
-                            length_of_party_bar = zb_add_icon(party_bar, length_of_party_bar, id, addonTable.swing_spells, src_guid)
-                            return
-                        end
-                    end 
-                end
-            end
+            length_of_party_bar = zb_handle_swing_events(party_bar, length_of_party_bar, spell_type, src_guid)
         end 
     end
 end
