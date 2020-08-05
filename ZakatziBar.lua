@@ -1,5 +1,7 @@
 local addonName, addonTable = ...
 
+local wow_version = select(4, GetBuildInfo())
+
 local is_debugging = false
 
 local specs_by_guid_list = {}
@@ -30,6 +32,7 @@ local total_time_elapsed = 0
 --Player identifier
 local player_guid = UnitGUID("player")
 local player_class = select(2, UnitClass("player"))
+local player_spec
 
 --Bar locations
 local player_bar_x = -225
@@ -252,6 +255,16 @@ local function zb_is_in_party(guid)
     return false
 end
 
+local function zb_update_arena_specs()
+    for i = 1, 5 do
+        local arenaGuid = UnitGUID("arena" .. i)
+        local specID = GetArenaOpponentSpec(i)
+        if specID and specID > 0 then
+            specs_by_guid_list[arenaGuid] = specID
+        end
+    end
+end
+
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_type, spell_name = select(12, ...)
@@ -408,9 +421,17 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
     return bar
 end
 
+local function zb_update_player_spec()
+    local id = GetSpecialization()
+    if id then
+        specs_by_guid_list[player_guid] = GetSpecializationInfo(id)
+    end
+end
+
 local function zb_clear_spec_list()
-    for character in pairs (specs_by_guid_list) do
-        specs_by_guid_list[character] = nil
+    table.clear(specs_by_guid_list)
+    if wow_version > 80000 then
+        zb_update_player_spec()
     end
 end
 
@@ -469,11 +490,19 @@ local function zb_commands(sub_string)
     end
 end
 
+
+
 local function zb_on_load(self)
         print("ZB loaded.")
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
+        if(wow_version > 80000) then
+            self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
+            self:RegisterEvent("ARENA_OPPONENT_UPDATE")
+            self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+            zb_update_player_spec()
+        end
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
         party_bar = zb_initialize_bar(party_bar, party_bar_x, party_bar_y, "zb_party")
         hostile_bar = zb_initialize_bar(hostile_bar, hostile_bar_x, hostile_bar_y, "zb_hostile")
@@ -486,6 +515,9 @@ local event_handler = {
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
     ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
+    ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
+    ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
+    ["PLAYER_SPECIALIZATION_CHANGED"] = function(self) zb_update_player_spec() end,
 }
 
 local function zb_on_event(self,event)
