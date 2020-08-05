@@ -44,7 +44,7 @@ local hostile_bar_y = -325
 
 local is_disabled = false
 
-local party_guid = {}
+local active_spells = {}
 
 local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
     if is_aura then
@@ -216,6 +216,20 @@ local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
         return length + 1
     end
     return length
+end
+
+local function zb_add(list, id, src_guid, dst_guid)
+    local key = id .. "_".. src_guid .. "_".. dst_guid
+    active_spells[key].id = id
+    active_spells[key].src_guid = src_guid
+    active_spells[key].dst_guid = dst_guid
+    if list[id].has_charges then
+        active_spells[key].has_chargers = list[id].has_charges - 1
+    end
+    active_spells[key].duration = zb_get_duration(list, id)
+    active_spells[key].start = get_time*2-count_delay_from_start
+    active_spells[key].cooldown = active_spells[key].start + active_spells[key].duration - get_time
+
 end
 
 local function zb_event_type(combat_event, bar, length, id, line, src_guid, dst_guid)
