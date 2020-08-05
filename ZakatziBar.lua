@@ -10,14 +10,13 @@ local track_all = true
 
 -- Number of buttons to spawn per bar
 local total_icons_per_bar = 15
--- How many active buttons?
-local length_of_hostile_bar = 1
-local length_of_party_bar = 1
-local length_of_player_bar = 1
 -- Button bars
 local hostile_bar
+hostile_bar.length = 1
 local party_bar
+party_bar.length = 1
 local player_bar
+player_bar.length = 1
 
 -- Delay for more accurate tracking
 local count_delay_from_start = 0
@@ -85,6 +84,17 @@ local function zb_remove_icon(bar, length, id, is_aura, src_guid, dst_guid)
     return length
 end
 
+local function zb_remove(id, src_guid, dst_guid)
+    local key = id .. "_" .. src_guid .. "_" .. dst_guid
+    if active_spells[key].button then
+        active_spells[key].button:Hide()
+        active_spells[key].button.flasher:Stop()
+        active_spells[key].button.is_playing = false
+        active_spells[key].button.text:SetText("")
+    end
+
+end
+
 
 local function zb_update_text(bar, index)
     if (bar[index].cooldown > 60) then
@@ -150,13 +160,13 @@ end
 local function zb_on_update(self, elapsed)
     total_time_elapsed = total_time_elapsed + elapsed;
     if total_time_elapsed >= update_interval then
-        if length_of_player_bar == 1 and length_of_hostile_bar == 1 and length_of_party_bar == 1 then
+        if player_bar.length == 1 and hostile_bar.length == 1 and party_bar.length == 1 then
             zb_frame:SetScript("OnUpdate",nil)
             return
         end
-        length_of_player_bar = zb_update_cooldowns(player_bar, length_of_player_bar, addonTable.player_spells_list)
-        length_of_hostile_bar = zb_update_cooldowns(hostile_bar, length_of_hostile_bar, addonTable.spells_list)
-        length_of_party_bar = zb_update_cooldowns(party_bar, length_of_party_bar, addonTable.spells_list)
+        player_bar.length = zb_update_cooldowns(player_bar, player_bar.length, addonTable.player_spells_list)
+        hostile_bar.length = zb_update_cooldowns(hostile_bar, hostile_bar.length, addonTable.spells_list)
+        party_bar.length = zb_update_cooldowns(party_bar, party_bar.length, addonTable.spells_list)
         total_time_elapsed = 0
     end
 end
@@ -229,6 +239,8 @@ local function zb_add(list, id, src_guid, dst_guid)
     active_spells[key].duration = zb_get_duration(list, id)
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = active_spells[key].start + active_spells[key].duration - get_time
+    
+    zb_frame:SetScript("OnUpdate", zb_on_update)
 
 end
 
@@ -304,39 +316,39 @@ local function zb_combat_log(...)
     if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].related then
         if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
-                length_of_player_bar = zb_remove_icon(player_bar, length_of_player_bar, related_id, true, src_guid)
+                player_bar.length = zb_remove_icon(player_bar, player_bar.length, related_id, true, src_guid)
             end
         elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
-                length_of_hostile_bar = zb_remove_icon(hostile_bar, length_of_hostile_bar, related_id, true, src_guid)
+                hostile_bar.length = zb_remove_icon(hostile_bar, hostile_bar.length, related_id, true, src_guid)
             end
         elseif zb_is_in_party(src_guid) then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
-                length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, related_id, true, src_guid)
+                party_bar.length = zb_remove_icon(party_bar, party_bar.length, related_id, true, src_guid)
             end
         end
     end
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 1) > 0 then 
             if zb_is_in_party(dst_guid) then
-                length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.player_spells_list, src_guid, dst_guid)
+                party_bar.length = zb_event_type(combat_event, party_bar, party_bar.length, spell_id, addonTable.player_spells_list, src_guid, dst_guid)
             else
-                length_of_player_bar = zb_event_type(combat_event, player_bar, length_of_player_bar, spell_id, addonTable.player_spells_list, src_guid)
+                player_bar.length = zb_event_type(combat_event, player_bar, player_bar.length, spell_id, addonTable.player_spells_list, src_guid)
             end
         elseif combat_event == "SWING_MISSED" then
-            length_of_player_bar = zb_handle_swing_events(player_bar, length_of_player_bar, spell_type, src_guid)
+            player_bar.length = zb_handle_swing_events(player_bar, player_bar.length, spell_type, src_guid)
         end  
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 2) > 0 then 
-            length_of_hostile_bar = zb_event_type(combat_event, hostile_bar, length_of_hostile_bar, spell_id, addonTable.spells_list, src_guid)
+            hostile_bar.length = zb_event_type(combat_event, hostile_bar, hostile_bar.length, spell_id, addonTable.spells_list, src_guid)
         elseif combat_event == "SWING_MISSED" then
-            length_of_hostile_bar = zb_handle_swing_events(hostile_bar, length_of_hostile_bar, spell_type, src_guid)
+            hostile_bar.length = zb_handle_swing_events(hostile_bar, hostile_bar.length, spell_type, src_guid)
         end 
     elseif zb_is_in_party(src_guid) then
         if addonTable.spells_list[spell_id] and bit.band(addonTable.spells_list[spell_id].who, 4) > 0 then 
-            length_of_party_bar = zb_event_type(combat_event, party_bar, length_of_party_bar, spell_id, addonTable.spells_list, src_guid)
+            party_bar.length = zb_event_type(combat_event, party_bar, party_bar.length, spell_id, addonTable.spells_list, src_guid)
         elseif combat_event == "SWING_MISSED" then
-            length_of_party_bar = zb_handle_swing_events(party_bar, length_of_party_bar, spell_type, src_guid)
+            party_bar.length = zb_handle_swing_events(party_bar, party_bar.length, spell_type, src_guid)
         end 
     end
 end
@@ -436,24 +448,46 @@ local function zb_reset_all(bar, length)
 end
 
 local function zb_entering_world()
-    length_of_player_bar = zb_reset_all(player_bar, length_of_player_bar)
-    length_of_hostile_bar = zb_reset_all(hostile_bar, length_of_hostile_bar)
-    length_of_party_bar = zb_reset_all(party_bar, length_of_party_bar)
+    player_bar.length = zb_reset_all(player_bar, player_bar.length)
+    hostile_bar.length = zb_reset_all(hostile_bar, hostile_bar.length)
+    party_bar.length = zb_reset_all(party_bar, party_bar.length)
+end
+
+local function zb_update_party_specs(event, ...)
+    local guid = ...
+    while index < 5 do
+        local member = "party" .. index
+        if UnitGUID(member) == guid then
+            specs_by_guid_list[guid] = GetInspectSpecialization(member)
+            return
+        end
+        index = index + 1
+    end
 end
 
 local function zb_remove_ex_party_member_icons()
     local index = 1
-    while index < length_of_party_bar do
+    while index < party_bar.length do
         if (party_bar[index].src_guid) then
             if not zb_is_in_party(party_bar[index].src_guid) then
-                length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+                party_bar.length = zb_remove_icon(party_bar, party_bar.length, index, false)
             end
         elseif (party_bar[index].dst_guid and party_bar[index].src_guid == player_guid) then
             if not zb_is_in_party(party_bar[index].dst_guid) then
-                length_of_party_bar = zb_remove_icon(party_bar, length_of_party_bar, index, false)
+                party_bar.length = zb_remove_icon(party_bar, party_bar.length, index, false)
             end
         end
         index = index + 1
+    end
+    if wow_version > 80000 then
+        local index = 1
+        while index < 5 do
+            local member = "party" .. index
+                if CheckInteractDistance(member, 1) and CanInspect(member) then
+                    NotifyInspect(member)
+                end
+            index = index + 1
+        end
     end
 end
 
@@ -493,6 +527,7 @@ local function zb_on_load(self)
             self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
             self:RegisterEvent("ARENA_OPPONENT_UPDATE")
             self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+            self:RegisterEvent("INSPECT_READY")
             zb_update_player_spec()
         end
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
@@ -510,10 +545,11 @@ local event_handler = {
     ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
     ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
     ["PLAYER_SPECIALIZATION_CHANGED"] = function(self) zb_update_player_spec() end,
+    ["INSPECT_READY"] = function(self, event) zb_update_party_specs(event, ...) end,
 }
 
-local function zb_on_event(self,event)
-	event_handler[event](self, event)
+local function zb_on_event(self,event, ...)
+	event_handler[event](self, event, ...)
 end
 
 if not zb_frame then 
