@@ -451,18 +451,6 @@ local function zb_entering_world()
     party_bar.length = zb_reset_all(party_bar, party_bar.length)
 end
 
-local function zb_update_party_specs(event, ...)
-    local guid = ...
-    while index < 5 do
-        local member = "party" .. index
-        if UnitGUID(member) == guid then
-            specs_by_guid_list[guid] = GetInspectSpecialization(member)
-            return
-        end
-        index = index + 1
-    end
-end
-
 local function zb_remove_ex_party_member_icons()
     local index = 1
     while index < party_bar.length do
@@ -476,16 +464,6 @@ local function zb_remove_ex_party_member_icons()
             end
         end
         index = index + 1
-    end
-    if wow_version > 80000 then
-        local index = 1
-        while index < 5 do
-            local member = "party" .. index
-                if CheckInteractDistance(member, 1) and CanInspect(member) then
-                    NotifyInspect(member)
-                end
-            index = index + 1
-        end
     end
 end
 
@@ -526,7 +504,6 @@ local function zb_on_load(self)
             self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
             self:RegisterEvent("ARENA_OPPONENT_UPDATE")
             self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-            self:RegisterEvent("INSPECT_READY")
             zb_update_player_spec()
         end
         player_bar = zb_initialize_bar(player_bar, player_bar_x, player_bar_y, "zb_player")
@@ -544,7 +521,6 @@ local event_handler = {
     ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
     ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
     ["PLAYER_SPECIALIZATION_CHANGED"] = function(self) zb_update_player_spec() end,
-    ["INSPECT_READY"] = function(self, event) zb_update_party_specs(event) end,
 }
 
 local function zb_on_event(self,event, ...)
