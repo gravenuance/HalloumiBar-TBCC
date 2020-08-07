@@ -518,6 +518,7 @@ end
 
 local function zb_on_load(self)
         print("ZB loaded.")
+        print("Size of spells list: " .. #addonTable.spells_list)
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
