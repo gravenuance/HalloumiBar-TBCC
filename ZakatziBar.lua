@@ -12,11 +12,8 @@ local track_all = true
 local total_icons_per_bar = 15
 -- Button bars
 local hostile_bar
-hostile_bar.length = 1
 local party_bar
-party_bar.length = 1
 local player_bar
-player_bar.length = 1
 
 -- Delay for more accurate tracking
 local count_delay_from_start = 0
@@ -360,6 +357,7 @@ local function zb_initialize_bar(bar, bar_x, bar_y, name)
     bar:SetClampedToScreen(true)
     bar:SetPoint("CENTER", UIParent, "CENTER", bar_x, bar_y)
     bar.name = name
+    bar.length = 1
     local location
     local icon
     local cooldown
@@ -545,7 +543,7 @@ local event_handler = {
     ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
     ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
     ["PLAYER_SPECIALIZATION_CHANGED"] = function(self) zb_update_player_spec() end,
-    ["INSPECT_READY"] = function(self, event) zb_update_party_specs(event, ...) end,
+    ["INSPECT_READY"] = function(self, event) zb_update_party_specs(event) end,
 }
 
 local function zb_on_event(self,event, ...)

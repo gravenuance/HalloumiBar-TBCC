@@ -3,4 +3,7 @@
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## DefaultState: Enabled
 
+Classic.lua
+Retail.lua
 ZakatziBar.lua
+
