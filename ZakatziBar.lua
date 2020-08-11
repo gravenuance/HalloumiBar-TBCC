@@ -88,8 +88,9 @@ local function zb_remove(id, src_guid, dst_guid)
         active_spells[key].button.flasher:Stop()
         active_spells[key].button.is_playing = false
         active_spells[key].button.text:SetText("")
+        active_spells[key].button = nil
     end
-
+    active_spells[key] = nil
 end
 
 
@@ -106,6 +107,22 @@ local function zb_update_text(bar, index)
         bar[index].text:SetTextColor(1,0,0,1)
         bar[index].text:SetFont(STANDARD_TEXT_FONT,24,"OUTLINE")
         bar[index].text:SetText(string.format("  %.0f", floor(bar[index].cooldown)))
+    end
+end
+
+local function zb_update_text_alt(button)
+    if (button.cooldown > 60) then
+        button.text:SetTextColor(1,1,0,1)
+        button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
+        button.text:SetText(string.format("%.0fm", floor(button.cooldown/60)))
+    elseif (button.cooldown >= 10) then
+        button.text:SetTextColor(1,1,0,1)
+        button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
+        button.text:SetText(string.format(" %.0f", floor(button.cooldown)))
+    else
+        button.text:SetTextColor(1,0,0,1)
+        button.text:SetFont(STANDARD_TEXT_FONT,24,"OUTLINE")
+        button.text:SetText(string.format("  %.0f", floor(button.cooldown)))
     end
 end
 
@@ -154,6 +171,31 @@ local function zb_update_cooldowns(bar, length, list)
     return length
 end
 
+local function zb_update_cooldowns_alt()
+    for key, value in pairs(active_spells) do
+        local get_time = GetTime()
+        value.cooldown = value.start + value.duration - get_time
+        if(value.cooldown <= 0) then
+            if value.has_charges and value.has_charges < value.max_charges then
+                value.has_charges = value.has_charges + 1
+                value.start = get_time
+                value.cooldown = value.duration
+                if value.button then
+                    value.button.cd:SetCooldown(value.start, value.duration)
+                    zb_update_text_alt(value.button)
+                end
+            else
+                zb_remove(value.id, value.src_guid, value.dst_guid)
+            end
+        end
+        if value.button then
+            zb_update_text_alt(value.button)
+        else
+            zb_add_button(value.id, value.src_guid, value.dst_guid)
+        end
+    end
+end
+
 local function zb_on_update(self, elapsed)
     total_time_elapsed = total_time_elapsed + elapsed;
     if total_time_elapsed >= update_interval then
@@ -166,6 +208,19 @@ local function zb_on_update(self, elapsed)
         party_bar.length = zb_update_cooldowns(party_bar, party_bar.length, addonTable.spells_list)
         total_time_elapsed = 0
     end
+end
+
+local function zb_on_update_alt(self, elapsed)
+    total_time_elapsed = total_time_elapsed + elapsed;
+    if total_time_elapsed >= update_interval then
+        if #active_spells == 0 then
+            zb_frame:SetScript("OnUpdate", nil)
+            return
+        end
+        zb_update_cooldowns_alt()
+        total_time_elapsed = 0
+    end
+
 end
 
 local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
@@ -225,19 +280,19 @@ local function zb_add_icon(bar, length, id, list, src_guid, dst_guid)
     return length
 end
 
-local function zb_add(list, id, src_guid, dst_guid)
+local function zb_add_icon_alt(list, id, src_guid, dst_guid)
     local key = id .. "_".. src_guid .. "_".. dst_guid
     active_spells[key].id = id
     active_spells[key].src_guid = src_guid
     active_spells[key].dst_guid = dst_guid
     if list[id].has_charges then
-        active_spells[key].has_chargers = list[id].has_charges - 1
+        active_spells[key].has_charges = list[id].has_charges - 1
+        active_spells[key].max_charges = list[id].has_charges
     end
     active_spells[key].duration = zb_get_duration(list, id)
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = active_spells[key].start + active_spells[key].duration - get_time
-    
-    zb_frame:SetScript("OnUpdate", zb_on_update)
+    zb_frame:SetScript("OnUpdate", zb_on_update_alt)
 
 end
 
@@ -439,6 +494,10 @@ end
 
 
 local function zb_reset_all(bar, length)
+    if (bar == nil or length == nil)
+        print("Bar or length is nil")
+        return
+    end
     while length > 1 do
         length = zb_remove_icon(bar, length, 1, false)
     end        
