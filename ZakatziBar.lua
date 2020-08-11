@@ -494,7 +494,7 @@ end
 
 
 local function zb_reset_all(bar, length)
-    if (bar == nil or length == nil)
+    if (bar == nil or length == nil) then
         print("Bar or length is nil")
         return
     end
