@@ -168,7 +168,7 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid)
 end
 
 local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
-    if line[id].event_type == "aura" then
+    if addonTable.spells_list[id].event_type == "aura" then
         if combat_event == "SPELL_AURA_APPLIED" then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
@@ -180,10 +180,10 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
             return
         end
     else
-        if combat_event == "SPELL_DAMAGE" and line[id].event_type == "damage"  then
+        if combat_event == "SPELL_DAMAGE" and addonTable.spells_list[id].event_type == "damage"  then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
-        elseif combat_event == "SPELL_CAST_SUCCESS" and line[id].event_type == "success" then
+        elseif combat_event == "SPELL_CAST_SUCCESS" and addonTable.spells_list[id].event_type == "success" then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         end
@@ -203,7 +203,7 @@ local function zb_is_in_party(guid)
     return false
 end
 
-local function zb_which_bar(list, combat_event, src_flags, src_guid, dst_flags, dst_guid)
+local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
         if bit.band(list[spell_id].who, 1) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
@@ -246,7 +246,7 @@ local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags
         if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
             for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
                 if swing_type == spell_type then
-                    local bar_index = zb_which_bar(addonTable.swing_spells, nil, src_flags, src_guid, dst_flags, dst_guid)
+                    local bar_index = zb_which_bar(addonTable.swing_spells, id, nil, src_flags, src_guid, dst_flags, dst_guid)
                     zb_add(bar_index, addonTable.swing_spells, id, src_guid, dst_guid)
                     return
                 end
@@ -273,16 +273,16 @@ local function zb_combat_log(...)
         specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
     if addonTable.spells_list[spell_id] then
-        local index = zb_which_bar(addonTable.spells_list, combat_event, src_guid, src_flags, dst_guid, dst_flags)
-        if index == nil then
+        local bar_index = zb_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
+        if bar_index == nil then
             return
         end
         if addonTable.spells_list[spell_id].related then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
-                zb_remove_all_from_src(id, src_guid)
+                zb_remove_all_from_src(related_id, src_guid)
             end
         end
-        zb_handle_event(index, combat_event, id, src_guid, dst_guid)
+        zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
     elseif combat_event == "SWING_MISSED" then
         zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
     end
@@ -346,10 +346,29 @@ local function zb_initialize_bars()
     end   
 end
 
+local function zb_commands(sub_string)
+    if sub_string == "debug" then
+        is_debugging = not is_debugging
+        if is_debugging then
+            print("Debugging on.")
+        else 
+            print("Debugging off.")
+        end
+    elseif sub_string == "clear" then
+        zb_entering_world()
+        zb_clear_spec_list()
+    elseif sub_string == "disable" then
+        is_disabled = not is_disabled
+    else
+        print("Available commands: Debug, clear, disable.")
+    end
+end
+
 local function zb_update_player_spec()
     local id = GetSpecialization()
     if id then
-        specs_by_guid_list[player_guid] = GetSpecializationInfo(id)
+        specs_by_guid_list[player_guid] = id
+        print(id)
     end
 end
 
@@ -380,24 +399,6 @@ end
 local function zb_entering_world()
     for key, value in pairs(active_spells) do
         zb_remove(value.id, value.src_guid, value.dst_guid)
-    end
-end
-
-local function zb_commands(sub_string)
-    if sub_string == "debug" then
-        is_debugging = not is_debugging
-        if is_debugging then
-            print("Debugging on.")
-        else 
-            print("Debugging off.")
-        end
-    elseif sub_string == "clear" then
-        zb_entering_world()
-        zb_clear_spec_list()
-    elseif sub_string == "disable" then
-        is_disabled = not is_disabled
-    else
-        print("Available commands: Debug, clear, disable.")
     end
 end
 
