@@ -38,63 +38,80 @@ local is_disabled = false
 local active_spells = {}
 local party_guid = {}
 
-local function zb_update_text(button)
-    if (button.cooldown > 60) then
+local function zb_update_text(button, cooldown)
+    if (cooldown > 60) then
         button.text:SetTextColor(1,1,0,1)
         button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
-        button.text:SetText(string.format("%.0fm", floor(button.cooldown/60)))
-    elseif (button.cooldown >= 10) then
+        button.text:SetText(string.format("%.0fm", floor(cooldown/60)))
+    elseif (cooldown >= 10) then
         button.text:SetTextColor(1,1,0,1)
         button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
-        button.text:SetText(string.format(" %.0f", floor(button.cooldown)))
+        button.text:SetText(string.format(" %.0f", floor(cooldown)))
     else
         button.text:SetTextColor(1,0,0,1)
         button.text:SetFont(STANDARD_TEXT_FONT,24,"OUTLINE")
-        button.text:SetText(string.format("  %.0f", floor(button.cooldown)))
+        button.text:SetText(string.format("  %.0f", floor(cooldown)))
     end
 end
 
-local function zb_remove_icon()
-
+local function zb_get_duration(value)
+    if specs_by_guid_list[value.src_guid] then
+        if value.durations[specs_by_guid_list[value.src_guid]] then
+            return value.durations[specs_by_guid_list[value.src_guid]]
+        end
+    end
+    for key, value in pairs(value.durations) do
+        return value
+    end
 end
 
-local function zb_remove(id, src_guid, dst_guid, reorder)
-    if (reorder == nil) then
-        reorder = true
-    end
+local function zb_remove(id, src_guid, dst_guid)
     local key = id .. "_" .. src_guid .. "_" .. dst_guid
     if active_spells[key].button then
-        active_spells[key].button:Hide()
-        active_spells[key].button.flasher:Stop()
-        active_spells[key].button.is_playing = false
-        active_spells[key].button.text:SetText("")
+        local index = active_spells[key].button.index
+        local jndex = active_spells[key].bar_index
+        while index < bars[jndex].length do
+            local next_value = active_spells[bars[jndex][index+1].key]
+            local duration = zb_get_duration(next_value)
+            bars[jndex][index].key = bars[jndex][index+1].key
+            bars[jndex][index].texture:SetTexture(bars[jndex][index+1].texture:GetTexture())
+            bars[jndex][index].text:SetText(bars[jndex][index+1].text:GetText())
+            bars[jndex][index].cd:SetCooldown(next_value.start,duration)
+            index = index + 1
+        end
+        bars[jndex][index]:Hide()
+        bars[jndex][index].text:SetText("")
+        bars[jndex][index].key = nil 
         active_spells[key].button = nil
-        -- get and re-order bar
     end
     active_spells[key] = nil
 end
 
-local function zb_add_icon(key)
+local function zb_add_icon(key, value, duration)
     if bars[bar_index].length <= total_icons_per_bar then
         local index = bars[bar_index].length
         bars[bar_index][index].key = key
-
+        local icon = select(3, GetSpellInfo(value.id))
+        bars[bar_index][index].texture:SetTexture(icon)
+        bars[bar_index][index].SetCooldown(value.start, duration)
+        bars[bar_index][index]:Show()
         bars[bar_index].length = bars[bar_index].length + 1
-
+        zb_update_text(bars[bar_index][index], value.cooldown)
     end
 end
 
 local function zb_update_cooldowns()
     for key, value in pairs(active_spells) do
         local get_time = GetTime()
-        value.cooldown = value.start + value.duration - get_time
+        local duration = zb_get_duration(value)
+        value.cooldown = value.start + duration - get_time
         if(value.cooldown <= 0) then
             if value.has_charges and value.has_charges < value.max_charges then
                 value.has_charges = value.has_charges + 1
                 value.start = get_time
-                value.cooldown = value.duration
+                value.cooldown = duration
                 if value.button then
-                    value.button.cd:SetCooldown(value.start, value.duration)
+                    value.button.cd:SetCooldown(value.start, duration)
                     zb_update_text(value.button)
                 end
             else
@@ -102,9 +119,9 @@ local function zb_update_cooldowns()
             end
         end
         if value.button then
-            zb_update_text(value.button)
+            zb_update_text(value.button, value.cooldown)
         else
-            -- zb add icon
+            zb_add_icon(key, value, duration)
         end
     end
 end
@@ -122,14 +139,18 @@ local function zb_on_update(self, elapsed)
 
 end
 
+local function zb_remove_all_from_src(id, src_guid)
+    for key, value in pairs(active_spells) do
+        if value.id == id and value.src_guid == src_guid then
+            zb_remove(id, src_guid, value.dst_guid)
+        end
+    end
+end
+
 local function zb_add(bar_index, list, id, src_guid, dst_guid)
     local key = id .. "_".. src_guid .. "_".. dst_guid
     if list[id].is_unique then
-        for key, value in pairs(active_spells) do
-            if value.id == id and value.src_guid == src_guid then
-                -- zb remove
-            end
-        end
+        zb_remove_all_from_src(id, src_guid)
     end
     active_spells[key].id = id
     active_spells[key].src_guid = src_guid
@@ -140,31 +161,30 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid)
         active_spells[key].has_charges = list[id].has_charges - 1
         active_spells[key].max_charges = list[id].has_charges
     end
-    active_spells[key].duration = zb_get_duration(list, id)
+    active_spells[key].durations = list[id].durations
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = active_spells[key].start + active_spells[key].duration - get_time
-    -- zb remove icon
     zb_frame:SetScript("OnUpdate", zb_on_update)
 end
 
-local function zb_event_type(bar_index, combat_event, id, line, src_guid, dst_guid)
+local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
     if line[id].event_type == "aura" then
         if combat_event == "SPELL_AURA_APPLIED" then
-            -- zb add
+            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_AURA_REMOVED" then
-            -- zb remove
+            zb_remove(id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_AURA_REFRESH" then
-            -- zb add
+            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         end
     else
         if combat_event == "SPELL_DAMAGE" and line[id].event_type == "damage"  then
-            -- zb add
+            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_CAST_SUCCESS" and line[id].event_type == "success" then
-            -- zb add
+            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         end
     end
@@ -221,12 +241,13 @@ local function zb_which_bar(list, combat_event, src_flags, src_guid, dst_flags, 
     return nil
 end
 
-local function zb_handle_swing_events(spell_type, src_guid, dst_guid)
+local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
     for id in pairs(addonTable.swing_spells) do
         if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
             for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
                 if swing_type == spell_type then
-                    -- zb add
+                    local bar_index = zb_which_bar(addonTable.swing_spells, nil, src_flags, src_guid, dst_flags, dst_guid)
+                    zb_add(bar_index, addonTable.swing_spells, id, src_guid, dst_guid)
                     return
                 end
             end 
@@ -258,12 +279,12 @@ local function zb_combat_log(...)
         end
         if addonTable.spells_list[spell_id].related then
             for related_id in pairs(addonTable.spells_list[spell_id].related) do
-                -- zb remove
+                zb_remove_all_from_src(id, src_guid)
             end
         end
-        -- zb handle event type
+        zb_handle_event(index, combat_event, id, src_guid, dst_guid)
     elseif combat_event == "SWING_MISSED" then
-        -- zb handle swing events
+        zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
     end
 end
 
@@ -300,8 +321,6 @@ local function zb_initialize_bars()
             cooldown = CreateFrame("Cooldown",nil, icon, "CooldownFrameTemplate")
             cooldown:SetAllPoints()
             cooldown:SetFrameStrata("MEDIUM")
-            cooldown.noomnicc = true
-            cooldown.noCooldownCount = true
             
             -- 
             local hidden_text = cooldown:GetRegions()
@@ -317,24 +336,8 @@ local function zb_initialize_bars()
             icon.cd = cooldown
             icon.text = text
 
-            icon.flasher = icon:CreateAnimationGroup()
-
-            local fade_out = icon.flasher:CreateAnimation("Alpha")
-            fade_out:SetDuration(0.5)
-            fade_out:SetFromAlpha(1)
-            fade_out:SetToAlpha(0.4)
-            fade_out:SetOrder(1)
-
-            local fade_in = icon.flasher:CreateAnimation("Alpha")
-            fade_in:SetDuration(0.5)
-            fade_in:SetToAlpha(1)
-            fade_in:SetFromAlpha(0.4)
-            fade_in:SetOrder(2)
-
-            icon.flasher:SetLooping("REPEAT")
-            icon.is_playing = false
-
             icon:Hide()
+            icon.index = index
             bar[index] = icon 
             index = index + 1
         end
