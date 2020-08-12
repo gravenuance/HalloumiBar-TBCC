@@ -16,7 +16,8 @@ local bars = {}
 local count_delay_from_start = 0
 
 -- Size of side of square
-local square_size = 45
+local square_size = 30
+local font_size = floor(square_size / 2)
 
 -- How often on_update runs
 local update_interval = 0.1
@@ -28,9 +29,9 @@ local player_class = select(2, UnitClass("player"))
 
 --Bar locations
 local bar_locations = {
-    [1] = { -225, -225 },
-    [2] = { -225, -275 },
-    [3] = { -225, -325 }
+    [1] = { -225, -150 },
+    [2] = { -225, -200 },
+    [3] = { -225, -250 }
 }
 
 local is_disabled = false
@@ -38,19 +39,19 @@ local is_disabled = false
 local active_spells = {}
 local party_guid = {}
 
-local function zb_update_text(button, cooldown)
+local function zb_update_text(bar_index, button_index, cooldown)
     if (cooldown > 60) then
-        button.text:SetTextColor(1,1,0,1)
-        button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
-        button.text:SetText(string.format("%.0fm", floor(cooldown/60)))
+        bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
+        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
+        bars[bar_index][button_index].text:SetText(string.format("%.0fm", floor(cooldown/60)))
     elseif (cooldown >= 10) then
-        button.text:SetTextColor(1,1,0,1)
-        button.text:SetFont(STANDARD_TEXT_FONT,20,"OUTLINE")
-        button.text:SetText(string.format(" %.0f", floor(cooldown)))
+        bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
+        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
+        bars[bar_index][button_index].text:SetText(string.format(" %.0f", floor(cooldown)))
     else
-        button.text:SetTextColor(1,0,0,1)
-        button.text:SetFont(STANDARD_TEXT_FONT,24,"OUTLINE")
-        button.text:SetText(string.format("  %.0f", floor(cooldown)))
+        bars[bar_index][button_index].text:SetTextColor(1,0,0,1)
+        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
+        bars[bar_index][button_index].text:SetText(string.format("  %.0f", floor(cooldown)))
     end
 end
 
@@ -67,36 +68,41 @@ end
 
 local function zb_remove(id, src_guid, dst_guid)
     local key = id .. "_" .. src_guid .. "_" .. dst_guid
-    if active_spells[key].button then
-        local index = active_spells[key].button.index
+    if active_spells[key] and active_spells[key].button_index then
+        local index = active_spells[key].button_index
         local jndex = active_spells[key].bar_index
         while index < bars[jndex].length do
-            local next_value = active_spells[bars[jndex][index+1].key]
-            local duration = zb_get_duration(next_value)
             bars[jndex][index].key = bars[jndex][index+1].key
+            local next_value = active_spells[bars[jndex][index].key]
+            if next_value then
+                local duration = zb_get_duration(next_value)
+                bars[jndex][index].cd:SetCooldown(next_value.start,duration)
+            end
             bars[jndex][index].texture:SetTexture(bars[jndex][index+1].texture:GetTexture())
             bars[jndex][index].text:SetText(bars[jndex][index+1].text:GetText())
-            bars[jndex][index].cd:SetCooldown(next_value.start,duration)
             index = index + 1
         end
         bars[jndex][index]:Hide()
         bars[jndex][index].text:SetText("")
         bars[jndex][index].key = nil 
         active_spells[key].button = nil
+        bars[jndex].length = bars[jndex].length - 1
     end
     active_spells[key] = nil
 end
 
 local function zb_add_icon(key, value, duration)
+    local bar_index = value.bar_index
     if bars[bar_index].length <= total_icons_per_bar then
         local index = bars[bar_index].length
         bars[bar_index][index].key = key
         local icon = select(3, GetSpellInfo(value.id))
         bars[bar_index][index].texture:SetTexture(icon)
-        bars[bar_index][index].SetCooldown(value.start, duration)
+        bars[bar_index][index].cd:SetCooldown(value.start, duration)
         bars[bar_index][index]:Show()
         bars[bar_index].length = bars[bar_index].length + 1
-        zb_update_text(bars[bar_index][index], value.cooldown)
+        zb_update_text(bar_index, index, value.cooldown)
+        active_spells[key].button_index = index
     end
 end
 
@@ -104,24 +110,23 @@ local function zb_update_cooldowns()
     for key, value in pairs(active_spells) do
         local get_time = GetTime()
         local duration = zb_get_duration(value)
-        value.cooldown = value.start + duration - get_time
-        if(value.cooldown <= 0) then
+        active_spells[key].cooldown = value.start + duration - get_time
+        if(active_spells[key].cooldown <= 0) then
             if value.has_charges and value.has_charges < value.max_charges then
-                value.has_charges = value.has_charges + 1
-                value.start = get_time
-                value.cooldown = duration
-                if value.button then
-                    value.button.cd:SetCooldown(value.start, duration)
-                    zb_update_text(value.button)
+                active_spells[key].has_charges = value.has_charges + 1
+                active_spells[key].start = get_time
+                active_spells[key].cooldown = duration
+                if value.button_index then
+                    bars[value.bar_index][value.button_index].cd:SetCooldown(get_time, duration)
+                    zb_update_text(bar_index, button_index, duration)
                 end
             else
                 zb_remove(value.id, value.src_guid, value.dst_guid)
             end
-        end
-        if value.button then
-            zb_update_text(value.button, value.cooldown)
+        elseif value.button_index then
+            zb_update_text(value.bar_index, value.button_index, active_spells[key].cooldown)
         else
-            zb_add_icon(key, value, duration)
+            zb_add_icon(key, active_spells[key], duration)
         end
     end
 end
@@ -129,7 +134,7 @@ end
 local function zb_on_update(self, elapsed)
     total_time_elapsed = total_time_elapsed + elapsed;
     if total_time_elapsed >= update_interval then
-        if active_spells.length == 0 then
+        if #active_spells == 1 then
             zb_frame:SetScript("OnUpdate", nil)
             return
         end
@@ -149,9 +154,10 @@ end
 
 local function zb_add(bar_index, list, id, src_guid, dst_guid)
     local key = id .. "_".. src_guid .. "_".. dst_guid
-    if list[id].is_unique then
+    if list[id].is_not_unique == (false or nil) then
         zb_remove_all_from_src(id, src_guid)
     end
+    active_spells[key] = {}
     active_spells[key].id = id
     active_spells[key].src_guid = src_guid
     active_spells[key].dst_guid = dst_guid
@@ -162,8 +168,10 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid)
         active_spells[key].max_charges = list[id].has_charges
     end
     active_spells[key].durations = list[id].durations
+    local duration = zb_get_duration(active_spells[key])
+    local get_time = GetTime()
     active_spells[key].start = get_time*2-count_delay_from_start
-    active_spells[key].cooldown = active_spells[key].start + active_spells[key].duration - get_time
+    active_spells[key].cooldown = active_spells[key].start + duration - get_time
     zb_frame:SetScript("OnUpdate", zb_on_update)
 end
 
@@ -303,7 +311,7 @@ local function zb_initialize_bars()
         local texture
         local text
         local index = 1
-        while index < total_icons_per_bar do
+        while index <= total_icons_per_bar do
             
             location = square_size * index + 5 * index
 
@@ -346,6 +354,27 @@ local function zb_initialize_bars()
     end   
 end
 
+local function zb_update_player_spec()
+    local id = GetSpecialization()
+    if id then
+        specs_by_guid_list[player_guid] = id
+        print(id)
+    end
+end
+
+local function zb_clear_spec_list()
+    table.wipe(specs_by_guid_list)
+    if wow_version > 80000 then
+        zb_update_player_spec()
+    end
+end
+
+local function zb_entering_world()
+    for key, value in pairs(active_spells) do
+        zb_remove(value.id, value.src_guid, value.dst_guid)
+    end
+end
+
 local function zb_commands(sub_string)
     if sub_string == "debug" then
         is_debugging = not is_debugging
@@ -364,14 +393,6 @@ local function zb_commands(sub_string)
     end
 end
 
-local function zb_update_player_spec()
-    local id = GetSpecialization()
-    if id then
-        specs_by_guid_list[player_guid] = id
-        print(id)
-    end
-end
-
 local function zb_on_load(self)
     print("ZB loaded.")
     print("Size of spells list: " .. #addonTable.spells_list)
@@ -387,19 +408,6 @@ local function zb_on_load(self)
     zb_initialize_bars()
     SlashCmdList["ZAKATZIBAR"] = zb_commands
     SLASH_ZAKATZIBAR1 = "/zb"
-end
-
-local function zb_clear_spec_list()
-    table.wipe(specs_by_guid_list)
-    if wow_version > 80000 then
-        zb_update_player_spec()
-    end
-end
-
-local function zb_entering_world()
-    for key, value in pairs(active_spells) do
-        zb_remove(value.id, value.src_guid, value.dst_guid)
-    end
 end
 
 local function zb_update_arena_specs()
