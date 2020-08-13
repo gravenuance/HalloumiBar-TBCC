@@ -56,6 +56,9 @@ local function zb_update_text(bar_index, button_index, cooldown)
 end
 
 local function zb_get_duration(value)
+    if value.given_duration then
+        return value.given_duration
+    end
     if specs_by_guid_list[value.src_guid] then
         if value.durations[specs_by_guid_list[value.src_guid]] then
             return value.durations[specs_by_guid_list[value.src_guid]]
@@ -177,8 +180,8 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = active_spells[key].start + duration - get_time
     if list[id].related_spells then
-        for value in pairs(list[id].related_spells) do
-            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, nil, value.duration)
+        for key, value in pairs(list[id].related_spells) do
+            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "RESERVED_GUID", value.duration)
         end
     end
     zb_frame:SetScript("OnUpdate", zb_on_update)
