@@ -70,7 +70,7 @@ local function zb_remove(id, src_guid, dst_guid)
     local key = id .. "_" .. src_guid .. "_" .. dst_guid
     if active_spells[key] and active_spells[key].button_index then
         local index = active_spells[key].button_index
-        local jndex = active_spells[key].bar_index
+        local jndex = active_spells[key].bar_index[1]
         while index < bars[jndex].length do
             bars[jndex][index].key = bars[jndex][index+1].key
             local next_value = active_spells[bars[jndex][index].key]
@@ -92,7 +92,7 @@ local function zb_remove(id, src_guid, dst_guid)
 end
 
 local function zb_add_icon(key, value, duration)
-    local bar_index = value.bar_index
+    local bar_index = value.bar_index[1]
     if bars[bar_index].length <= total_icons_per_bar then
         local index = bars[bar_index].length
         bars[bar_index][index].key = key
@@ -152,7 +152,7 @@ local function zb_remove_all_from_src(id, src_guid)
     end
 end
 
-local function zb_add(bar_index, list, id, src_guid, dst_guid)
+local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
     local key = id .. "_".. src_guid .. "_".. dst_guid
     if list[id].is_not_unique == (false or nil) then
         zb_remove_all_from_src(id, src_guid)
@@ -167,11 +167,20 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid)
         active_spells[key].has_charges = list[id].has_charges - 1
         active_spells[key].max_charges = list[id].has_charges
     end
-    active_spells[key].durations = list[id].durations
+    if given_duration then
+        active_spells[key].given_duration = given_duration
+    else
+        active_spells[key].durations = list[id].durations
+    end
     local duration = zb_get_duration(active_spells[key])
     local get_time = GetTime()
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = active_spells[key].start + duration - get_time
+    if list[id].related_spells then
+        for value in pairs(list[id].related_spells) do
+            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, nil, value.duration)
+        end
+    end
     zb_frame:SetScript("OnUpdate", zb_on_update)
 end
 
@@ -216,34 +225,34 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
         if bit.band(list[spell_id].who, 1) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if zb_is_in_party(dst_guid) then
-                    return 2
+                    return { 2, 1 }
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-                    return 3
+                    return { 3, 1 }
                 end
             end
-            return 1
+            return { 1, 1 }
         end
     elseif zb_is_in_party(src_guid) then
         if bit.band(list[spell_id].who, 2) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-                    return 3
+                    return { 3, 2 }
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-                    return 1
+                    return { 1, 2 }
                 end
             end
-            return 2
+            return { 2, 2 }
         end
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
         if bit.band(list[spell_id].who, 4) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if zb_is_in_party(dst_guid) then
-                    return 2
+                    return { 2, 3 }
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-                    return 1
+                    return { 1, 3 }
                 end
             end
-            return 3
+            return { 3, 3 }
         end
     end
     return nil
