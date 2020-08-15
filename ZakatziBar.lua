@@ -440,7 +440,8 @@ local function zb_update_arena_specs()
         local arenaGuid = UnitGUID("arena" .. i)
         local specID = GetArenaOpponentSpec(i)
         if specID and specID > 0 then
-            specs_by_guid_list[arenaGuid] = specID
+            local specIndex = select(1,GetSpecializationInfoByID(specID))
+            specs_by_guid_list[arenaGuid] = specIndex
         end
     end
 end
