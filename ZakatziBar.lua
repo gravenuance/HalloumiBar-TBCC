@@ -56,8 +56,8 @@ local function zb_update_text(bar_index, button_index, cooldown)
 end
 
 local function zb_get_duration(value)
-    if value.given_duration then
-        return value.given_duration
+    if value.duration then
+        return value.duration
     end
     if specs_by_guid_list[value.src_guid] then
         if value.durations[specs_by_guid_list[value.src_guid]] then
@@ -74,21 +74,21 @@ local function zb_remove(id, src_guid, dst_guid)
     if active_spells[key] and active_spells[key].button_index then
         local index = active_spells[key].button_index
         local jndex = active_spells[key].bar_index[1]
-        while index < bars[jndex].length do
+        while index < bars[jndex].length - 1 do
             bars[jndex][index].key = bars[jndex][index+1].key
             local next_value = active_spells[bars[jndex][index].key]
             if next_value then
-                local duration = zb_get_duration(next_value)
-                bars[jndex][index].cd:SetCooldown(next_value.start,duration)
+                bars[jndex][index].cd:SetCooldown(next_value.start,zb_get_duration(next_value))
+                active_spells[bars[jndex][index].key].button_index = index
             end
             bars[jndex][index].texture:SetTexture(bars[jndex][index+1].texture:GetTexture())
             bars[jndex][index].text:SetText(bars[jndex][index+1].text:GetText())
             index = index + 1
         end
         bars[jndex][index]:Hide()
+        bars[jndex][index].cd:SetCooldown(0,0)
         bars[jndex][index].text:SetText("")
         bars[jndex][index].key = nil 
-        active_spells[key].button = nil
         bars[jndex].length = bars[jndex].length - 1
     end
     active_spells[key] = nil
@@ -121,13 +121,13 @@ local function zb_update_cooldowns()
                 active_spells[key].cooldown = duration
                 if value.button_index then
                     bars[value.bar_index][value.button_index].cd:SetCooldown(get_time, duration)
-                    zb_update_text(bar_index, button_index, duration)
+                    zb_update_text(bar_index[1], button_index, duration)
                 end
             else
                 zb_remove(value.id, value.src_guid, value.dst_guid)
             end
         elseif value.button_index then
-            zb_update_text(value.bar_index, value.button_index, active_spells[key].cooldown)
+            zb_update_text(value.bar_index[1], value.button_index, active_spells[key].cooldown)
         else
             zb_add_icon(key, active_spells[key], duration)
         end
@@ -160,12 +160,17 @@ local function zb_remove_all_from_src(id, src_guid, cooldown)
     end
 end
 
-local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
+local function zb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     local key = id .. "_".. src_guid .. "_".. dst_guid
-    local duration = given_duration or zb_get_duration(list[id])
+    local duration
+    if related_spell then
+        duration = related_spell.duration
+    else 
+        duration = zb_get_duration(list[id])
+    end
     local get_time = GetTime()
     local cooldown = get_time-count_delay_from_start + duration
-    if list[id].is_not_unique == (false or nil) then
+    if (related_spell and related_spell.is_not_unique == (false or nil)) or (list[id] and list[id].is_not_unique == (false or nil)) then
         zb_remove_all_from_src(id, src_guid, cooldown)
     end
     active_spells[key] = {}
@@ -173,20 +178,24 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
     active_spells[key].src_guid = src_guid
     active_spells[key].dst_guid = dst_guid
     active_spells[key].bar_index = bar_index
-    active_spells[key].event_type = list[id].event_type
-    if list[id].has_charges then
-        active_spells[key].has_charges = list[id].has_charges - 1
-        active_spells[key].max_charges = list[id].has_charges
+    if related_spell then
+        active_spells[key].duration = duration
+        active_spells[key].event_type = "DEV_TYPE"
+    else
+        active_spells[key].event_type = list[id].event_type
+        if list[id].has_charges then
+            active_spells[key].has_charges = list[id].has_charges - 1
+            active_spells[key].max_charges = list[id].has_charges
+        end
+        active_spells[key].durations = list[id].durations
     end
-    if given_duration then
-        active_spells[key].given_duration = given_duration
-    end
-    active_spells[key].durations = list[id].durations
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = cooldown
-    if list[id].related_spells then
+    if related_spell == nil and list[id].related_spells then
         for key, value in pairs(list[id].related_spells) do
-            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value.duration)
+            if value.id ~= id then
+                zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value)
+            end
         end
     end
     zb_frame:SetScript("OnUpdate", zb_on_update)
@@ -375,7 +384,6 @@ local function zb_update_player_spec()
     local id = GetSpecialization()
     if id then
         specs_by_guid_list[player_guid] = id
-        print(id)
     end
 end
 
