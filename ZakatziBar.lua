@@ -147,18 +147,26 @@ local function zb_on_update(self, elapsed)
 
 end
 
-local function zb_remove_all_from_src(id, src_guid)
+local function zb_remove_all_from_src(id, src_guid, cooldown)
     for key, value in pairs(active_spells) do
         if value.id == id and value.src_guid == src_guid then
-            zb_remove(id, src_guid, value.dst_guid)
+            if cooldown and value.cooldown >= cooldown then
+                return false
+            end
+            if value.dst_guid ~= "DEV_GUID" then
+                zb_remove(id, src_guid, value.dst_guid)
+            end
         end
     end
 end
 
 local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
     local key = id .. "_".. src_guid .. "_".. dst_guid
+    local duration = given_duration or zb_get_duration(list[id])
+    local get_time = GetTime()
+    local cooldown = get_time-count_delay_from_start + duration
     if list[id].is_not_unique == (false or nil) then
-        zb_remove_all_from_src(id, src_guid)
+        zb_remove_all_from_src(id, src_guid, cooldown)
     end
     active_spells[key] = {}
     active_spells[key].id = id
@@ -172,16 +180,13 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, given_duration)
     end
     if given_duration then
         active_spells[key].given_duration = given_duration
-    else
-        active_spells[key].durations = list[id].durations
     end
-    local duration = zb_get_duration(active_spells[key])
-    local get_time = GetTime()
+    active_spells[key].durations = list[id].durations
     active_spells[key].start = get_time*2-count_delay_from_start
-    active_spells[key].cooldown = active_spells[key].start + duration - get_time
+    active_spells[key].cooldown = cooldown
     if list[id].related_spells then
         for key, value in pairs(list[id].related_spells) do
-            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "RESERVED_GUID", value.duration)
+            zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value.duration)
         end
     end
     zb_frame:SetScript("OnUpdate", zb_on_update)
