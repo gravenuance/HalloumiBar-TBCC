@@ -10,4 +10,4 @@ You can also track item-related events, so it would work well with trinket track
 
 I do not actively play retail or classic, so I have not really optimized the addon's tracking yet. <br />
 
-The most difficult feature to add in so far is the tracking of cooldown reduction, because it is always approximate (active and/or passive).<br />
+The most difficult feature to add in so far is the tracking of timer reduction, because it is always approximate (active and/or passive).<br />
