@@ -289,6 +289,35 @@ local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags
     end
 end
 
+local function zb_combat_log_wotlk(timestamp, combat_event, src_guid, src_name, src_flags, dst_guid, dst_name, dst_flags, spell_id, spell_name)
+    count_delay_from_start = GetTime()
+    if is_debugging and (src_guid == (player_guid or UnitGUID("target"))) then
+        print(spell_id)
+        print(spell_name)
+        print(combat_event)
+    end
+    if is_disabled then
+        return
+    end
+    if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].is_special_spell then
+        specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
+    end
+    if addonTable.spells_list[spell_id] then
+        local bar_index = zb_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
+        if bar_index == nil then
+            return
+        end
+        if addonTable.spells_list[spell_id].related then
+            for related_id in pairs(addonTable.spells_list[spell_id].related) do
+                zb_remove_all_from_src(related_id, src_guid)
+            end
+        end
+        zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
+    elseif combat_event == "SWING_MISSED" then
+        zb_handle_swing_events(spell_id, src_flags, src_guid, dst_flags, dst_guid)
+    end
+end
+
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_type, spell_name = select(12, ...)
@@ -423,7 +452,11 @@ local function zb_on_load(self)
     print("Size of spells list: " .. #addonTable.spells_list)
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("GROUP_ROSTER_UPDATE")
+    if(wow_version > 30000 and wow_version < 40000) then
+        self:RegisterEvent("PARTY_MEMBERS_CHANGED")
+    else
+        self:RegisterEvent("GROUP_ROSTER_UPDATE")
+    end
     if(wow_version > 80000) then
         self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
         self:RegisterEvent("ARENA_OPPONENT_UPDATE")
@@ -466,7 +499,7 @@ end
 local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
-    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
+    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) if(wow_version > 30000 and wow_version < 40000) then zb_combat_log_wotlk(...) else zb_combat_log(CombatLogGetCurrentEventInfo()) end end,
     ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
     ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
     ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
