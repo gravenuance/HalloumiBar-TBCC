@@ -1,9 +1,9 @@
-## Interface: 11305
 ## Title: ZakatziBar
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## DefaultState: Enabled
 
 Classic.lua
 Retail.lua
+Wotlk.lua
 ZakatziBar.lua
 
