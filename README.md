@@ -9,6 +9,7 @@ It can also track class specs by looking at spec specific spells being used (or 
 You can also track item-related events, so it would work well with trinket tracking in Classic (or WotLK). <br />
 
 I do not actively play retail or classic, so I have not really optimized the addon's tracking yet. <br />
+I am going to be updating the addon for TBC and WOTLK. <br />
 
 The most difficult feature to add in so far is the tracking of timer reduction, because it is always approximate (active and/or passive).<br />
 I am of the opinion that passive cooldown reduction is bad game design.<br />
