@@ -121,7 +121,7 @@ local function zb_update_cooldowns()
                 active_spells[key].cooldown = duration
                 if value.button_index then
                     bars[value.bar_index][value.button_index].cd:SetCooldown(get_time, duration)
-                    zb_update_text(bar_index[1], button_index, duration)
+                    zb_update_text(value.bar_index, value.button_index, duration)
                 end
             else
                 zb_remove(value.id, value.src_guid, value.dst_guid)
