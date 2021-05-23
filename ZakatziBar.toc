@@ -2,6 +2,7 @@
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## DefaultState: Enabled
 
+Wotlk.lua
 Tbc.lua
 ZakatziBar.lua
 
