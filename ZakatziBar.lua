@@ -231,7 +231,6 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
             return    
         end
     end
-    return length
 end
 
 local function zb_is_in_party(guid)
