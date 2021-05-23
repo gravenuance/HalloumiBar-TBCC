@@ -1,10 +1,10 @@
 local addonName, addonTable = ...
 
 local wow_version = select(4, GetBuildInfo())
-print(wow_version)
+--print(wow_version)
 local calc_version_uno = math.floor(wow_version/20000)
 local calc_version_dos = wow_version%20000
-print(calc_version_uno ~= 1 or calc_version_dos > 10000)
+--print(calc_version_uno ~= 1 or calc_version_dos > 10000)
 if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
 
 -- a quick guide to the variable "who"
