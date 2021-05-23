@@ -185,132 +185,55 @@ addonTable.spells_list = {
   [5730] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Stoneclaw Totem
   [2484] = {durations = {15}, event_type = "success", trigger_groups=6}, -- Earthbind Totem
   [16166] = {durations = {180}, event_type = "success", trigger_groups=6}, -- Elemental Mastery
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  -- Warlock
+  [29858] = {durations = {300}, event_type = "success", trigger_groups=6}, -- Soulshatter
+  [17962] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Conflagrate
+  [6353] = {durations = {60}, event_type = "success", trigger_groups=6}, -- Soulfire
+  [19505] = {durations = {8}, event_type = "success", trigger_groups=6}, -- Devour Magic
+  [18708] = {durations = {900}, event_type = "success", trigger_groups=6}, -- Fel Domination
+  [6229] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Shadow Ward
+  [603] = {durations = {60}, event_type = "success", trigger_groups=6}, -- Curse of Doom
+  [17735] = {durations = {120}, event_type = "success", trigger_groups=6}, -- Suffering
+  [18288] = {durations = {180}, event_type = "success", trigger_groups=6}, -- Amplify Curse
+  [7814] = {durations = {6}, event_type = "success", trigger_groups=6}, -- Lash of Pain
+  [6789] = {durations = {120}, event_type = "success", trigger_groups=6}, -- Death Coil
+  [5484] = {durations = {40}, event_type = "success", trigger_groups=6}, -- Howl of Terror
+  [3716] = {durations = {5}, event_type = "success", trigger_groups=6}, -- Torment
+  [4511] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Phase Shift
+  [19244] = {durations = {24}, event_type = "success", trigger_groups=6}, -- Spell Lock
+  [17877] = {durations = {15}, event_type = "success", trigger_groups=6}, -- Shadowburn
+  [29893] = {durations = {300}, event_type = "success", trigger_groups=6}, -- Ritual of Souls
+  [30283] = {durations = {20}, event_type = "success", trigger_groups=6}, -- Shadowfury
+  [6360] = {durations = {4}, event_type = "success", trigger_groups=6}, -- Soothing Kiss
+  -- Warrior
+  [1161] = {durations = {420}, event_type = "success", trigger_groups=6}, -- Challenging Shout
+  [1719] = {durations = {1200}, event_type = "success", trigger_groups=6}, -- Recklessness
+  [2565] = {durations = {5}, event_type = "success", trigger_groups=6}, -- Shield Block
+  [5246] = {durations = {180}, event_type = "success", trigger_groups=6}, -- Intimidating Shout
+  [7384] = {durations = {5}, event_type = "success", trigger_groups=6}, -- Overpower
+  [2687] = {durations = {60}, event_type = "success", trigger_groups=6}, -- Bloodrage
+  [12328] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Sweeping Strikes
+  [20252] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Intercept
+  [12809] = {durations = {45}, event_type = "success", trigger_groups=6}, -- Concussion Blow
+  [20230] = {durations = {1200}, event_type = "success", trigger_groups=6}, -- Retaliation
+  [100] = {durations = {15}, event_type = "success", trigger_groups=6}, -- Charge
+  [676] = {durations = {60}, event_type = "success", trigger_groups=6}, -- Disarm
+  [694] = {durations = {120}, event_type = "success", trigger_groups=6}, -- Mocking Blow
+  [6572] = {durations = {5}, event_type = "success", trigger_groups=6}, -- Revenge
+  [12294] = {durations = {5}, event_type = "success", trigger_groups=6}, -- Mortal Strike
+  [72] = {durations = {12}, event_type = "success", trigger_groups=6}, -- Shield Bash
+  [23920] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Spell Reflection
+  [871] = {durations = {1200}, event_type = "success", trigger_groups=6}, -- Shield Wall
+  [3411] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Intervene
+  [1680] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Whirlwind
+  [6552] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Pummel
+  [23922] = {durations = {6}, event_type = "success", trigger_groups=6}, -- Shield Slam
+  [12975] = {durations = {480}, event_type = "success", trigger_groups=6}, -- Last Stand
+  [18499] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Berserker Rage
+  [23881] = {durations = {6}, event_type = "success", trigger_groups=6}, -- Bloodthirst
+  [355] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Taunt
+  [6343] = {durations = {4}, event_type = "success", trigger_groups=6}, -- Thunderclap
+  [12292] = {durations = {180}, event_type = "success", trigger_groups=6}, -- Death Wish
 }
 
 addonTable.swing_spells = {}
