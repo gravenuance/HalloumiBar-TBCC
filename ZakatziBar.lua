@@ -1,5 +1,7 @@
 local addonName, addonTable = ...
 
+
+
 local wow_version = select(4, GetBuildInfo())
 
 local is_debugging = false
@@ -191,8 +193,8 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     end
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = cooldown
-    if related_spell == nil and list[id].related_spells then
-        for key, value in pairs(list[id].related_spells) do
+    if related_spell == nil and list[id].spells_that_also_go_on_cooldown then
+        for key, value in pairs(list[id].spells_that_also_go_on_cooldown) do
             if value.id ~= id then
                 zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value)
             end
@@ -220,6 +222,9 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
         elseif combat_event == "SPELL_CAST_SUCCESS" and addonTable.spells_list[id].event_type == "success" then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
+        elseif combat_event == "SPELL_AURA_REMOVED" and addonTable.spells_list[id].event_type == "cooldown_on_remove"  then
+            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            return    
         end
     end
     return length
@@ -307,8 +312,8 @@ local function zb_combat_log_wotlk(timestamp, combat_event, src_guid, src_name, 
         if bar_index == nil then
             return
         end
-        if addonTable.spells_list[spell_id].related then
-            for related_id in pairs(addonTable.spells_list[spell_id].related) do
+        if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
+            for related_id in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
                 zb_remove_all_from_src(related_id, src_guid)
             end
         end
@@ -340,8 +345,8 @@ local function zb_combat_log(...)
         if bar_index == nil then
             return
         end
-        if addonTable.spells_list[spell_id].related then
-            for related_id in pairs(addonTable.spells_list[spell_id].related) do
+        if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
+            for related_id in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
                 zb_remove_all_from_src(related_id, src_guid)
             end
         end
@@ -449,7 +454,6 @@ end
 
 local function zb_on_load(self)
     print("ZB loaded.")
-    print("Size of spells list: " .. #addonTable.spells_list)
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     if(wow_version > 30000 and wow_version < 40000) then
