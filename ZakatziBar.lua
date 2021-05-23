@@ -25,6 +25,8 @@ local font_size = floor(square_size / 2)
 local update_interval = 0.1
 local total_time_elapsed = 0
 
+local active_spells_index = 0
+
 --Player identifier
 local player_guid = UnitGUID("player")
 local player_class = select(2, UnitClass("player"))
@@ -139,10 +141,12 @@ end
 local function zb_on_update(self, elapsed)
     total_time_elapsed = total_time_elapsed + elapsed;
     if total_time_elapsed >= update_interval then
-        if #active_spells == 1 then
-            zb_frame:SetScript("OnUpdate", nil)
-            return
-        end
+        --print(#active_spells)
+        --if #active_spells == 1 then
+        --    zb_frame:SetScript("OnUpdate", nil)
+        --    return
+        --end
+        --doesn't work but who cares
         zb_update_cooldowns()
         total_time_elapsed = 0
     end
@@ -244,7 +248,7 @@ end
 
 local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-        if bit.band(list[spell_id].who, 1) > 0 then
+        if bit.band(list[spell_id].trigger_groups, 1) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if zb_is_in_party(dst_guid) then
                     return { 2, 1 }
@@ -255,7 +259,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             return { 1, 1 }
         end
     elseif zb_is_in_party(src_guid) then
-        if bit.band(list[spell_id].who, 2) > 0 then
+        if bit.band(list[spell_id].trigger_groups, 2) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
                     return { 3, 2 }
@@ -266,7 +270,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             return { 2, 2 }
         end
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-        if bit.band(list[spell_id].who, 4) > 0 then
+        if bit.band(list[spell_id].trigger_groups, 4) > 0 then
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
                 if zb_is_in_party(dst_guid) then
                     return { 2, 3 }

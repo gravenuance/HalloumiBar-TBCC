@@ -11,12 +11,12 @@ if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
 -- when a spell is in the list, if it is cast, it will always be evaluated
 -- the "who" variable decides whether or not the addon user WANTS the variable to BE evaluated for a particular target type (party, self, hostile)
 -- it does that through a bit operation. 1 for self, 2 for party, 4 for hostile. u can add those numbers depending on which types u want the spell to be tracked for.
--- trigger_group
+-- trigger_groups
 
 addonTable.spells_list = {
-  [11286] = {durations = {5}, event_type = "success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
+  --[11286] = {durations = {5}, event_type = "success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
-  [14185] = {durations = {600}, event_type = "success", trigger_group=6, spells_that_are_removed_from_cooldown={1857, 26669, 11305, 14183, 36554}},
+  [14185] = {durations = {600}, event_type = "success", trigger_groups=6, spells_that_are_removed_from_cooldown={1857, 26669, 11305, 14183, 36554}},
   [11285] = {durations = {10}, event_type = "success", trigger_groups=6},
   [1769] = {durations = {10}, event_type = "success", trigger_groups=6},
   [26669] = {durations = {300}, event_type = "success", trigger_groups=6},
