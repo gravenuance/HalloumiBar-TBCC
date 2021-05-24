@@ -29,7 +29,7 @@ addonTable.spells_list = {
   [13877] = {durations = {120}, event_type = "success", trigger_groups=6}, -- Blade Flurry
   [14278] = {durations = {20}, event_type = "success", trigger_groups=6}, -- Ghostly Strike
   [2094] = {durations = {90}, event_type = "success", trigger_groups=6}, -- Blind
-  [14183] = {durations = {120}, event_type = "success", trigger_groups=6}, -- Premeditation
+  [14183] = {durations = {120}, event_type = "success", trigger_groups=7}, -- Premeditation
   [5277] = {durations = {210}, event_type = "success", trigger_groups=6}, -- Evasion
   [14177] = {durations = {180}, event_type = "cooldown_on_remove", trigger_groups=6}, -- Cold Blood
   [31224] = {durations = {60}, event_type = "success", trigger_groups=6}, -- Cloak of Shadows
