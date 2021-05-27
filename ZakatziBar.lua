@@ -43,32 +43,32 @@ local is_disabled = false
 local active_spells = {}
 local party_guid = {}
 
+-- i made it look so weird but it just updates text
 local function zb_update_text(bar_index, button_index, cooldown)
-    if (cooldown > 60) then
+    bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
+    if (cooldown >= 10) then
         bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
-        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
-        bars[bar_index][button_index].text:SetText(string.format("%.0fm", floor(cooldown/60)))
-    elseif (cooldown >= 10) then
-        bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
-        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
+        if(cooldown > 60) then
+            bars[bar_index][button_index].text:SetText(string.format("%.0fm", floor(cooldown/60)))
+            return
+        end
         bars[bar_index][button_index].text:SetText(string.format(" %.0f", floor(cooldown)))
     else
         bars[bar_index][button_index].text:SetTextColor(1,0,0,1)
-        bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
         bars[bar_index][button_index].text:SetText(string.format("  %.0f", floor(cooldown)))
     end
 end
 
 local function zb_get_duration(value)
     if value.duration then
-        return value.duration
+        return value.duration -- if only one duration present, use this
     end
-    if specs_by_guid_list[value.src_guid] then
+    if specs_by_guid_list[value.src_guid] then -- will see if guid has spec (found thru identifying spells)
         if value.durations[specs_by_guid_list[value.src_guid]] then
-            return value.durations[specs_by_guid_list[value.src_guid]]
+            return value.durations[specs_by_guid_list[value.src_guid]] -- and get the correct duration
         end
     end
-    for key, value in pairs(value.durations) do
+    for key, value in pairs(value.durations) do -- will get the first duration, not always at index 0
         return value
     end
 end
@@ -119,7 +119,7 @@ local function zb_update_cooldowns()
         local duration = zb_get_duration(value)
         active_spells[key].cooldown = value.start + duration - get_time
         if(active_spells[key].cooldown <= 0) then
-            if value.has_charges and value.has_charges < value.max_charges then
+            if value.has_charges and value.has_charges < value.max_charges then -- this is a retail thing
                 active_spells[key].has_charges = value.has_charges + 1
                 active_spells[key].start = get_time
                 active_spells[key].cooldown = duration
