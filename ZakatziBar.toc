@@ -1,4 +1,4 @@
-## Title: ZakatziBar
+## Title: |cFFFFB6C1ZakatziBar|r
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## DefaultState: Enabled
 
