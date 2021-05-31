@@ -1,3 +1,4 @@
+## Interface: 20501
 ## Title: |cFFFFB6C1ZakatziBar|r
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## Author: Gravenuance
