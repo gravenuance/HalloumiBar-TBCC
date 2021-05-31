@@ -1,5 +1,6 @@
 ## Title: |cFFFFB6C1ZakatziBar|r
 ## Notes: Inspired by InterruptBar and TellMeWhen
+## Author: Gravenuance
 ## DefaultState: Enabled
 
 Wotlk.lua
