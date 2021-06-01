@@ -5,7 +5,6 @@
 ## Version: 1.0B
 ## DefaultState: Enabled
 
-Wotlk.lua
 Tbc.lua
 ZakatziBar.lua
 
