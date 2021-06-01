@@ -15,7 +15,7 @@ if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
 addonTable.spells_list = {
   --[11285] = {durations = {5}, event_type = "success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
-  [14185] = {durations = {600}, event_type = "success", trigger_groups=6, spells_that_are_removed_from_cooldown={14177, 36554, 2983, 1856, 14183, 5277}},
+  [14185] = {durations = {600}, event_type = "success", trigger_groups=6, spells_that_are_removed_from_cooldown={14177, 36554, 2983, 1856, 14183, 5277}}, -- Preparation
   [1776] = {durations = {9}, event_type = "success", trigger_groups=6}, -- Gouge
   [1766] = {durations = {10}, event_type = "success", trigger_groups=6}, -- Kick
   [1725] = {durations = {30}, event_type = "success", trigger_groups=6}, -- Distract
