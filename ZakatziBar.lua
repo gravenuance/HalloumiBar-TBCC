@@ -1,9 +1,5 @@
 local addonName, addonTable = ...
 
-
-
-local wow_version = select(4, GetBuildInfo())
-
 local is_debugging = false
 
 local specs_by_guid_list = {}
@@ -24,8 +20,6 @@ local font_size = floor(square_size / 2)
 -- How often on_update runs
 local update_interval = 0.1
 local total_time_elapsed = 0
-
-local active_spells_index = 0
 
 --Player identifier
 local player_guid = UnitGUID("player")
@@ -297,35 +291,6 @@ local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags
     end
 end
 
-local function zb_combat_log_wotlk(timestamp, combat_event, src_guid, src_name, src_flags, dst_guid, dst_name, dst_flags, spell_id, spell_name)
-    count_delay_from_start = GetTime()
-    if is_debugging and (src_guid == (player_guid or UnitGUID("target"))) then
-        print(spell_id)
-        print(spell_name)
-        print(combat_event)
-    end
-    if is_disabled then
-        return
-    end
-    if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].is_special_spell then
-        specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
-    end
-    if addonTable.spells_list[spell_id] then
-        local bar_index = zb_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
-        if bar_index == nil then
-            return
-        end
-        if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
-            for related_id in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
-                zb_remove_all_from_src(related_id, src_guid)
-            end
-        end
-        zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
-    elseif combat_event == "SWING_MISSED" then
-        zb_handle_swing_events(spell_id, src_flags, src_guid, dst_flags, dst_guid)
-    end
-end
-
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_type, spell_name = select(12, ...)
@@ -417,18 +382,8 @@ local function zb_initialize_bars()
     end   
 end
 
-local function zb_update_player_spec()
-    local id = GetSpecialization()
-    if id then
-        specs_by_guid_list[player_guid] = id
-    end
-end
-
 local function zb_clear_spec_list()
     table.wipe(specs_by_guid_list)
-    if wow_version > 80000 then
-        zb_update_player_spec()
-    end
 end
 
 local function zb_entering_world()
@@ -459,31 +414,10 @@ local function zb_on_load(self)
     print("ZB loaded.")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    if(wow_version > 30000 and wow_version < 40000) then
-        self:RegisterEvent("PARTY_MEMBERS_CHANGED")
-    else
-        self:RegisterEvent("GROUP_ROSTER_UPDATE")
-    end
-    if(wow_version > 80000) then
-        self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
-        self:RegisterEvent("ARENA_OPPONENT_UPDATE")
-        self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-        zb_update_player_spec()
-    end
+    self:RegisterEvent("GROUP_ROSTER_UPDATE")
     zb_initialize_bars()
     SlashCmdList["ZAKATZIBAR"] = zb_commands
     SLASH_ZAKATZIBAR1 = "/zb"
-end
-
-local function zb_update_arena_specs()
-    for i = 1, 5 do
-        local arenaGuid = UnitGUID("arena" .. i)
-        local specID = GetArenaOpponentSpec(i)
-        if specID and specID > 0 then
-            local specIndex = select(1,GetSpecializationInfoByID(specID))
-            specs_by_guid_list[arenaGuid] = specIndex
-        end
-    end
 end
 
 local function zb_remove_ex_party_member_icons()
@@ -506,11 +440,8 @@ end
 local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
-    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) if(wow_version > 30000 and wow_version < 40000) then zb_combat_log_wotlk(...) else zb_combat_log(CombatLogGetCurrentEventInfo()) end end,
+    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
     ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
-    ["ARENA_PREP_OPPONENT_SPECIALIZATIONS"] = function(self) zb_update_arena_specs() end,
-    ["ARENA_OPPONENT_UPDATE"] = function(self) zb_update_arena_specs() end,
-    ["PLAYER_SPECIALIZATION_CHANGED"] = function(self) zb_update_player_spec() end,
 }
 
 local function zb_on_event(self,event, ...)
