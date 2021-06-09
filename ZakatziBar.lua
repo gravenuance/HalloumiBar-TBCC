@@ -263,15 +263,17 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             return { 2, 2 }
         end
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-        if bit.band(list[spell_id].trigger_groups, 4) > 0 then
-            if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
-                if zb_is_in_party(dst_guid) then
-                    return { 2, 3 }
-                elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-                    return { 1, 3 }
+        if bit.band(src_flags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then
+            if bit.band(list[spell_id].trigger_groups, 4) > 0 then
+                if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
+                    if zb_is_in_party(dst_guid) then
+                        return { 2, 3 }
+                    elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
+                        return { 1, 3 }
+                    end
                 end
+                return { 3, 3 }
             end
-            return { 3, 3 }
         end
     end
     return nil
