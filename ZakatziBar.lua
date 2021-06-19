@@ -229,7 +229,7 @@ end
 
 local function zb_is_in_party(guid)
     local index = 1
-    while index < 5 do
+    while index < GetNumGroupMembers() do
         local party_member_guid = UnitGUID("party" .. index)
         if (party_member_guid and party_guid[party_member_guid]) then
             return true
