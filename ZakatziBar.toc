@@ -2,7 +2,7 @@
 ## Title: |cFFFFB6C1ZakatziBar|r
 ## Notes: Inspired by InterruptBar and TellMeWhen
 ## Author: Gravenuance
-## Version: 1.0C
+## Version: 1.1
 ## DefaultState: Enabled
 
 Database.lua
