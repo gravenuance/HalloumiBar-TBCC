@@ -35,7 +35,6 @@ local bar_locations = {
 local is_disabled = false
 
 local active_spells = {}
-local party_guid = {}
 
 -- i made it look so weird but it just updates text
 local function zb_update_text(bar_index, button_index, cooldown)
@@ -246,10 +245,10 @@ local function zb_is_in_party(guid)
 end
 
 local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
-    if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
-        if bit.band(list[spell_id].trigger_groups, 1) > 0 then
+    if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- i casted
+        if bit.band(list[spell_id].trigger_groups, 1) > 0 then -- triggers when i cast
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
-                if zb_is_in_party(dst_guid) then
+                if zb_is_in_party(dst_guid) then -- destination is in grp
                     return { 2, 1 }
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
                     return { 3, 1 }
@@ -257,24 +256,24 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             end
             return { 1, 1 }
         end
-    elseif zb_is_in_party(src_guid) then
-        if bit.band(list[spell_id].trigger_groups, 2) > 0 then
+    elseif zb_is_in_party(src_guid) then -- source is in grp
+        if bit.band(list[spell_id].trigger_groups, 2) > 0 then -- triggers when grp casts
             if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
-                if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
+                if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if destination is enemy
                     return { 3, 2 }
-                elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
+                elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if destination is me
                     return { 1, 2 }
                 end
             end
             return { 2, 2 }
         end
-    elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-        if bit.band(src_flags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then
-            if bit.band(list[spell_id].trigger_groups, 4) > 0 then
+    elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if source is hostile
+        if bit.band(src_flags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then -- if source is controled by player
+            if bit.band(list[spell_id].trigger_groups, 4) > 0 then -- triggers when enemy casts
                 if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
-                    if zb_is_in_party(dst_guid) then
+                    if zb_is_in_party(dst_guid) then -- if dest is in grp
                         return { 2, 3 }
-                    elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then
+                    elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if dest is me
                         return { 1, 3 }
                     end
                 end
