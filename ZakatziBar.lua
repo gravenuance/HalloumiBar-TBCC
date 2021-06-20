@@ -228,13 +228,19 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
 end
 
 local function zb_is_in_party(guid)
-    local index = 1
-    while index < GetNumGroupMembers() do
-        local party_member_guid = UnitGUID("party" .. index)
-        if (party_member_guid and party_guid[party_member_guid]) then
+    if (not IsInRaid() and not IsInGroup()) then
+        return false
+    end
+    for index=1, GetNumGroupMembers() do
+        local party_member_guid = nil
+        if(IsInRaid()) then
+            party_member_guid = UnitGUID("raid" .. index)
+        else
+            party_member_guid = UnitGUID("party" .. index)
+        end
+        if (party_member_guid == guid) then
             return true
         end
-        index = index + 1
     end
     return false
 end
