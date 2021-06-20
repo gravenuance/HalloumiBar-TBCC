@@ -419,7 +419,7 @@ local function zb_commands(sub_string)
 end
 
 local function zb_on_load(self)
-    print("ZB loaded.")
+    print("ZB loaded. Type /zb for more info.")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("GROUP_ROSTER_UPDATE")
@@ -428,28 +428,10 @@ local function zb_on_load(self)
     SLASH_ZAKATZIBAR1 = "/zb"
 end
 
-local function zb_remove_ex_party_member_icons()
-    for key, value in pairs(active_spells) do
-        if party_guid[value.src_guid] or party_guid[value.dst_guid] then
-            zb_remove(value.id, value.src_guid, value.dst_guid)
-        end
-    end
-    local index = 1
-    table.wipe(party_guid)
-    while index < 5 do
-        local party_member_guid = UnitGUID("party" .. index)
-        if (party_member_guid) then
-            party_guid[party_member_guid] = true
-        end
-        index = index + 1
-    end
-end
-
 local event_handler = {
     ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
     ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
     ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
-    ["GROUP_ROSTER_UPDATE"] = function(self) zb_remove_ex_party_member_icons() end,
 }
 
 local function zb_on_event(self,event, ...)
