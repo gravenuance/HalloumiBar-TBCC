@@ -421,7 +421,6 @@ local function zb_on_load(self)
     print("ZakatziBar loaded. Type /zb for more info.")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("GROUP_ROSTER_UPDATE")
     zb_initialize_bars()
     SlashCmdList["ZAKATZIBAR"] = zb_commands
     SLASH_ZAKATZIBAR1 = "/zb"
