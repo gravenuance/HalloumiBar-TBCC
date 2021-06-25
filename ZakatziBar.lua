@@ -247,7 +247,7 @@ end
 local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- i casted
         if bit.band(list[spell_id].trigger_groups, 1) > 0 then -- triggers when i cast
-            if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
+            if addonTable.spells_list[spell_id].event_type == "aura" then
                 if zb_is_in_party(dst_guid) then -- destination is in grp
                     return { 2, 1 } -- friendly (dst) and self bar (src)
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
@@ -258,7 +258,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
         end
     elseif zb_is_in_party(src_guid) then -- source is in grp
         if bit.band(list[spell_id].trigger_groups, 2) > 0 then -- triggers when grp casts
-            if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
+            if addonTable.spells_list[spell_id].event_type == "aura" then
                 if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if destination is enemy
                     return { 3, 2 } -- enemy (dst) and friendly (src)
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if destination is me
@@ -270,7 +270,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if source is hostile
         if bit.band(src_flags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- if source is a player
             if bit.band(list[spell_id].trigger_groups, 4) > 0 then -- triggers when enemy casts
-                if (combat_event == ("SPELL_AURA_APPLIED" or "SPELL_AURA_REMOVED")) then
+                if addonTable.spells_list[spell_id].event_type == "aura" then
                     if zb_is_in_party(dst_guid) then -- if dest is in grp
                         return { 2, 3 } -- friendly (dst) and enemy (src)
                     elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if dest is me
@@ -308,6 +308,9 @@ local function zb_combat_log(...)
         print(spell_name)
         print(combat_event)
         print(spell_type)
+        if addonTable.spells_list[spell_id] then
+            print(addonTable.spells_list[spell_id].event_type)
+        end
     end
     if is_disabled then
         return

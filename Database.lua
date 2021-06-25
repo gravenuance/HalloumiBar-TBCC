@@ -13,73 +13,73 @@ if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
 -- it does that through a bit operation. 1 for self, 2 for party, 4 for hostile. u can add those numbers depending on which types u want the spell to be tracked for.
 
 addonTable.spells_list = {
-  --[11285] = {durations = {5}, event_type = "cast_cast_success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
+  --[11285] = {durations = {5}, event_type = "cast_success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
-  [14185] = {durations = {600}, event_type = "cast_cast_success", trigger_groups=6, spells_that_are_removed_from_cooldown={14177, 36554, 11305, 26889, 14183, 26669}}, -- Preparation
-  [38764] = {durations = {9}, event_type = "cast_cast_success", trigger_groups=6}, -- Gouge
-  [38768] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=6}, -- Kick
-  [1725] = {durations = {30}, event_type = "cast_cast_success", trigger_groups=6}, -- Distract
-  [27448] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=6}, -- Feint
-  [8643] = {durations = {20}, event_type = "cast_cast_success", trigger_groups=6}, -- Kidney Shot
-  [36554] = {durations = {30}, event_type = "cast_cast_success", trigger_groups=6}, -- Shadowstep
-  [11305] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Sprint
-  [1787] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Stealth
-  [26889] = {durations = {360}, event_type = "cast_cast_success", trigger_groups=6}, -- Vanish
-  [14251] = {durations = {6}, event_type = "cast_cast_success", trigger_groups=6}, -- Riposte
-  [13877] = {durations = {120}, event_type = "cast_cast_success", trigger_groups=6}, -- Blade Flurry
-  [14278] = {durations = {20}, event_type = "cast_cast_success", trigger_groups=6}, -- Ghostly Strike
-  [2094] = {durations = {90}, event_type = "cast_cast_success", trigger_groups=6}, -- Blind
-  [14183] = {durations = {120}, event_type = "cast_cast_success", trigger_groups=7}, -- Premeditation
-  [26669] = {durations = {210}, event_type = "cast_cast_success", trigger_groups=6}, -- Evasion
+  [14185] = {durations = {600}, event_type = "cast_success", trigger_groups=6, spells_that_are_removed_from_cooldown={14177, 36554, 11305, 26889, 14183, 26669}}, -- Preparation
+  [38764] = {durations = {9}, event_type = "cast_success", trigger_groups=6}, -- Gouge
+  [38768] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Kick
+  [1725] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Distract
+  [27448] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Feint
+  [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Kidney Shot
+  [36554] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Shadowstep
+  [11305] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Sprint
+  [1787] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Stealth
+  [26889] = {durations = {360}, event_type = "cast_success", trigger_groups=6}, -- Vanish
+  [14251] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Riposte
+  [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Blade Flurry
+  [14278] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Ghostly Strike
+  [2094] = {durations = {90}, event_type = "cast_success", trigger_groups=6}, -- Blind
+  [14183] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Premeditation
+  [26669] = {durations = {210}, event_type = "cast_success", trigger_groups=6}, -- Evasion
   [14177] = {durations = {180}, event_type = "cooldown_on_remove", trigger_groups=6}, -- Cold Blood
-  [31224] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Cloak of Shadows
-  [13750] = {durations = {300}, event_type = "cast_cast_success", trigger_groups=6}, -- Adrenaline Rush
+  [31224] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Cloak of Shadows
+  [13750] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Adrenaline Rush
   -- Druid
-  [24453] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=7}, -- Prowl
-  [26999] = {durations = {180}, event_type = "cast_cast_success", trigger_groups=6}, -- Frenzied Regeneration
-  [8983] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=7}, -- Bash
-  [5209] = {durations = {600}, event_type = "cast_cast_success", trigger_groups=6}, -- Challenging Roar
-  [27048] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=6}, -- Cower
-  [33357] = {durations = {300}, event_type = "cast_cast_success", trigger_groups=6}, -- Dash
-  [5229] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=1}, -- Enrage
-  [33831] = {durations = {180}, event_type = "cast_cast_success", trigger_groups=6}, -- Force of Nature
-  [33987] = {durations = {6}, event_type = "cast_cast_success", trigger_groups=7}, -- Mangle (Bear)
-  [16979] = {durations = {15}, event_type = "cast_cast_success", trigger_groups=6}, -- Feral Charge
-  [27047] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=7}, -- Growl
-  [18562] = {durations = {15}, event_type = "cast_cast_success", trigger_groups=6}, -- Swiftmend
-  [27012] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Hurricane
-  [27011] = {durations = {6}, event_type = "cast_cast_success", trigger_groups=7}, -- Faerie Fire (Feral)
-  [29166] = {durations = {360}, event_type = "cast_cast_success", trigger_groups=6}, -- Innervate
-  [27009] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Nature's Grasp
-  [17116] = {durations = {180}, event_type = "cast_cast_success", trigger_groups=6}, -- Nature's Swiftness
-  [26994] = {durations = {1200}, event_type = "cast_cast_success", trigger_groups=6}, -- Rebirth
-  [22812] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Barkskin
-  [26983] = {durations = {600}, event_type = "cast_cast_success", trigger_groups=6}, -- Tranquility
+  [24453] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Prowl
+  [26999] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Frenzied Regeneration
+  [8983] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Bash
+  [5209] = {durations = {600}, event_type = "cast_success", trigger_groups=6}, -- Challenging Roar
+  [27048] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Cower
+  [33357] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Dash
+  [5229] = {durations = {60}, event_type = "cast_success", trigger_groups=1}, -- Enrage
+  [33831] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Force of Nature
+  [33987] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Mangle (Bear)
+  [16979] = {durations = {15}, event_type = "cast_success", trigger_groups=6}, -- Feral Charge
+  [27047] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Growl
+  [18562] = {durations = {15}, event_type = "cast_success", trigger_groups=6}, -- Swiftmend
+  [27012] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Hurricane
+  [27011] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Faerie Fire (Feral)
+  [29166] = {durations = {360}, event_type = "cast_success", trigger_groups=6}, -- Innervate
+  [27009] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Nature's Grasp
+  [17116] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Nature's Swiftness
+  [26994] = {durations = {1200}, event_type = "cast_success", trigger_groups=6}, -- Rebirth
+  [22812] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Barkskin
+  [26983] = {durations = {600}, event_type = "cast_success", trigger_groups=6}, -- Tranquility
   -- Hunter
-  [14327] = {durations = {30}, event_type = "cast_cast_success", trigger_groups=6}, -- Scare Beast
-  [19574] = {durations = {120}, event_type = "cast_cast_success", trigger_groups=6}, -- Bestial Wrath
-  [19503] = {durations = {30}, event_type = "cast_cast_success", trigger_groups=6}, -- Scatter Shot
-  [27018] = {durations = {15}, event_type = "cast_cast_success", trigger_groups=6}, -- Viper Sting
-  [34026] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Kill Command
-  [34477] = {durations = {120}, event_type = "cast_cast_success", trigger_groups=6}, -- Misdirection
-  [27685] = {durations = {25}, event_type = "cast_cast_success", trigger_groups=6}, -- Charge
-  [23989] = {durations = {300}, event_type = "cast_cast_success", trigger_groups=6}, -- Readiness
-  [3045] = {durations = {180}, event_type = "cast_cast_success", trigger_groups=6}, -- Rapid Fire
-  [34600] = {durations = {24}, event_type = "cast_cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Snake Trap
-  [27023] = {durations = {24}, event_type = "cast_cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Immolation Trap
-  [27025] = {durations = {24}, event_type = "cast_cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 13809, duration = 24},{id = 14311, duration = 24},}}, -- Explosive Trap
-  [14311] = {durations = {24}, event_type = "cast_cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 13809, duration = 24},}}, -- Freezing Trap
-  [13809] = {durations = {24}, event_type = "cast_cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},}}, -- Frost Trap
-  [36916] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Mongoose Bite THIS IS A SWING EVENT
-  [27019] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Arcane Shot
-  [27022] = {durations = {60}, event_type = "cast_cast_success", trigger_groups=6}, -- Volley
-  [27014] = {durations = {6}, event_type = "cast_cast_success", trigger_groups=6}, -- Raptor Strike
-  [5384] = {durations = {30}, event_type = "cast_cast_success", trigger_groups=6}, -- Feign Death
-  [27015] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Disengage
-  [34490] = {durations = {20}, event_type = "cast_cast_success", trigger_groups=6}, -- Silencing Shot
-  [27021] = {durations = {10}, event_type = "cast_cast_success", trigger_groups=6}, -- Multi-Shot
-  [27067] = {durations = {5}, event_type = "cast_cast_success", trigger_groups=6}, -- Counterattack
-  [19263] = {durations = {300}, event_type = "cast_cast_success", trigger_groups=6}, -- Deterrence
+  [14327] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Scare Beast
+  [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Bestial Wrath
+  [19503] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Scatter Shot
+  [27018] = {durations = {15}, event_type = "cast_success", trigger_groups=6}, -- Viper Sting
+  [34026] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Kill Command
+  [34477] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Misdirection
+  [27685] = {durations = {25}, event_type = "cast_success", trigger_groups=6}, -- Charge
+  [23989] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Readiness
+  [3045] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Rapid Fire
+  [34600] = {durations = {24}, event_type = "cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Snake Trap
+  [27023] = {durations = {24}, event_type = "cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Immolation Trap
+  [27025] = {durations = {24}, event_type = "cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 13809, duration = 24},{id = 14311, duration = 24},}}, -- Explosive Trap
+  [14311] = {durations = {24}, event_type = "cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 13809, duration = 24},}}, -- Freezing Trap
+  [13809] = {durations = {24}, event_type = "cast_success", trigger_groups=6, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},}}, -- Frost Trap
+  [36916] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Mongoose Bite THIS IS A SWING EVENT
+  [27019] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Arcane Shot
+  [27022] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Volley
+  [27014] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Raptor Strike
+  [5384] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Feign Death
+  [27015] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Disengage
+  [34490] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Silencing Shot
+  [27021] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Multi-Shot
+  [27067] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Counterattack
+  [19263] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Deterrence
   [27068] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Wyvern Sting
   [27065] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Aimed Shot
   [27020] = {durations = {8}, event_type = "cast_success", trigger_groups=6}, -- Distracting Shot
