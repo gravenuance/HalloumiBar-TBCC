@@ -23,7 +23,7 @@ addonTable.spells_list = {
   [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Kidney Shot
   [36554] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Shadowstep
   [11305] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Sprint
-  [1787] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Stealth
+  [1787] = {durations = {5}, event_type = "cooldown_on_remove", trigger_groups=6}, -- Stealth
   [26889] = {durations = {360}, event_type = "cast_success", trigger_groups=6}, -- Vanish
   [14251] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Riposte
   [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Blade Flurry
