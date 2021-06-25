@@ -35,7 +35,7 @@ addonTable.spells_list = {
   [31224] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Cloak of Shadows
   [13750] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Adrenaline Rush
   -- Druid
-  [24453] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Prowl
+  [9913] = {durations = {10}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Prowl
   [26999] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Frenzied Regeneration
   [8983] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Bash
   [5209] = {durations = {600}, event_type = "cast_success", trigger_groups=6}, -- Challenging Roar
