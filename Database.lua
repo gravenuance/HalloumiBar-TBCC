@@ -91,7 +91,7 @@ addonTable.spells_list = {
   [33043] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Dragon's Breath
   [1953] = {durations = {13}, event_type = "cast_success", trigger_groups=6}, -- Blink
   [27128] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Fireward
-  [27079] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Fire Blast
+  [27079] = {durations = {6}, event_type = "spell_damage", trigger_groups=6}, -- Fire Blast
   [11129] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Combustion
   [12472] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Icy Veins
   [45438] = {durations = {240}, event_type = "cast_success", trigger_groups=6}, -- Ice block
@@ -107,12 +107,12 @@ addonTable.spells_list = {
   [12042] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Arcane Power
   [12051] = {durations = {480}, event_type = "cast_success", trigger_groups=6}, -- Evocation
   -- Paladin
-  [27180] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Hammer of Wrath
+  [27180] = {durations = {6}, event_type = "spell_damage", trigger_groups=6}, -- Hammer of Wrath
   [31789] = {durations = {15}, event_type = "cast_success", trigger_groups=6}, -- Righteous Defense
   [32700] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Avenger's Shield
   [31884] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Avenging Wrath
   [27179] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Holy Shield
-  [35395] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Crusader Strike
+  [35395] = {durations = {6}, event_type = "spell_damage", trigger_groups=6}, -- Crusader Strike
   [31842] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Divine Illumination
   [1020] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Divine Shield
   [27139] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Holy Wrath
@@ -122,7 +122,7 @@ addonTable.spells_list = {
   [27154] = {durations = {2400}, event_type = "cast_success", trigger_groups=6}, -- Lay on Hands
   [20066] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Repentance
   [5573] = {durations = {300}, event_type = "cast_success", trigger_groups=6}, -- Divine Protection
-  [20271] = {durations = {8}, event_type = "cast_success", trigger_groups=6}, -- Judgement
+  [20271] = {durations = {8}, event_type = "spell_damage", trigger_groups=6}, -- Judgement
   [10308] = {durations = {45}, event_type = "cast_success", trigger_groups=6}, -- Hammer of Justice
   [10278] = {durations = {180}, event_type = "cast_success", trigger_groups=6}, -- Blessing of Protection
   [27148] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Blessing of Sacrifice
@@ -201,7 +201,7 @@ addonTable.spells_list = {
   [676] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Disarm
   [25266] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Mocking Blow
   [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Revenge
-  [30330] = {durations = {5}, event_type = "cast_success", trigger_groups=6}, -- Mortal Strike
+  [30330] = {durations = {5}, event_type = "spell_damage", trigger_groups=6}, -- Mortal Strike
   [29704] = {durations = {12}, event_type = "cast_success", trigger_groups=6}, -- Shield Bash
   [23920] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Spell Reflection
   [871] = {durations = {1200}, event_type = "cast_success", trigger_groups=6}, -- Shield Wall
