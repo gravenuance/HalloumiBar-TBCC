@@ -303,7 +303,7 @@ local function zb_combat_log(...)
     local spell_type, spell_name = select(12, ...)
     local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
-    if is_debugging and (src_guid == (player_guid or UnitGUID("target"))) then
+    if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) and addonTable.spells_list[spell_id] then
         print(spell_id)
         print(spell_name)
         print(combat_event)
