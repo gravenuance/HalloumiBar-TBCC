@@ -16,8 +16,8 @@ addonTable.spells_list = {
   --[11285] = {durations = {5}, event_type = "cast_success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
   [14185] = {durations = {600}, event_type = "cast_success", trigger_groups=6, spells_that_are_removed_from_cooldown={14177, 36554, 11305, 26889, 14183, 26669}}, -- Preparation
-  [38764] = {durations = {9}, event_type = "cast_success", trigger_groups=6}, -- Gouge
-  [38768] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Kick
+  [38764] = {durations = {9}, event_type = "spell_damage", trigger_groups=6}, -- Gouge
+  [38768] = {durations = {10}, event_type = "spell_damage", trigger_groups=6}, -- Kick
   [1725] = {durations = {30}, event_type = "cast_success", trigger_groups=6}, -- Distract
   [27448] = {durations = {10}, event_type = "cast_success", trigger_groups=6}, -- Feint
   [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Kidney Shot
@@ -25,9 +25,9 @@ addonTable.spells_list = {
   [11305] = {durations = {60}, event_type = "cast_success", trigger_groups=6}, -- Sprint
   [1787] = {durations = {5}, event_type = "cooldown_on_remove", trigger_groups=6}, -- Stealth
   [26889] = {durations = {360}, event_type = "cast_success", trigger_groups=6}, -- Vanish
-  [14251] = {durations = {6}, event_type = "cast_success", trigger_groups=6}, -- Riposte
+  [14251] = {durations = {6}, event_type = "spell_damage", trigger_groups=6}, -- Riposte
   [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=6}, -- Blade Flurry
-  [14278] = {durations = {20}, event_type = "cast_success", trigger_groups=6}, -- Ghostly Strike
+  [14278] = {durations = {20}, event_type = "spell_damage", trigger_groups=6}, -- Ghostly Strike
   [2094] = {durations = {90}, event_type = "cast_success", trigger_groups=6}, -- Blind
   [14183] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Premeditation
   [26669] = {durations = {210}, event_type = "cast_success", trigger_groups=6}, -- Evasion
