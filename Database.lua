@@ -263,4 +263,22 @@ addonTable.special_spells_list = {
   [36554] = 3, -- Sub, Shadowstep
   -- Shaman
   [16166] = 1, -- Ele, Elemental Mastery
+  [30706] = 1, -- Ele, Elemental Mastery
+  [17364] = 2, -- Enha, Stormstrike
+  [30823] = 2, -- Enha, Shamanistic Rage
+  [16190] = 3, -- Resto, Mana Tide Totem
+  [32594] = 3, -- Resto, Earth Shield
+  -- Warlock
+  [27265] = 1, -- Affli, Dark Pact
+  [30405] = 1, -- Affli, Unstable Affliction
+  [19028] = 2, -- Demo, Soul Link
+  [30146] = 2, -- Demo, Summon Felguard
+  [30912] = 3, -- Destro, Conflagrate
+  [30414] = 3, -- Destro, Shadowfury
+  -- Warrior
+  [30330] = 1, -- Arms, Mortal Strike
+  [30335] = 2, -- Fury, Bloodthirst
+  [30033] = 2, -- Fury, Rampage
+  [30356] = 3, -- Prot, Shield Slam
+  [30022] = 3, -- Prot, Devastate
 }
