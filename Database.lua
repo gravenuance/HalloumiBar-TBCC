@@ -218,3 +218,49 @@ addonTable.spells_list = {
 }
 
 addonTable.swing_spells = {}
+
+addonTable.special_spells_list = {
+  -- Druid
+  [24858] = 1, -- Moonkin, Moonkin Form
+  [33831] = 1, -- Moonkin, Force of Nature
+  [24932] = 2, -- Feral, Leader of the Pack
+  [33987] = 2, -- Feral, Mangle(Bear)
+  [33983] = 2, -- Feral, Mangle(Cat)
+  [18562] = 3, -- Resto, Swiftmend
+  [33891] = 3, -- Resto, Tree of Life
+  -- Hunter
+  [19574] = 1, -- BM, Bestial Wrath
+  [27066] = 2, -- MM, Trueshot Aura
+  [34490] = 2, -- MM, Silencing Shot
+  [27068] = 3, -- SV, Wyvern Sting
+  [23989] = 3, -- SV, Readiness
+  -- Mage
+  [12042] = 1, -- Arcane, Arcane Power
+  [31589] = 1, -- Arcane, Slow
+  [11129] = 2, -- Fire, Combustion
+  [33043] = 2, -- Fire, Dragon's Fire
+  [33405] = 3, -- Frost, Ice Barrier
+  [31687] = 3, -- Frost, Summon Water Elemental
+  -- Paladin
+  [33072] = 1, -- Holy, Holy Shock
+  [31842] = 1, -- Holy, Divine Illumination
+  [27179] = 2, -- Prot, Holy Shield
+  [32700] = 2, -- Prot, Avenger's Shield
+  [20066] = 3, -- Ret, Repentance
+  [35395] = 3, -- Ret, Crusader Strike
+  -- Priest
+  [10060] = 1, -- Disc, Power Infusion
+  [33206] = 1, -- Disc, Pain Suppression
+  [28275] = 2, -- Holy, Lightwell
+  [34866] = 2, -- Holy, Circle of Healing
+  [15473] = 3, -- Shadow, Shadowform
+  [34917] = 3, -- Shadow, Vampiric Touch
+  -- Rogue
+  [34413] = 1, -- Ass, Mutilate
+  [13750] = 2, -- Combat, Adrenaline Rush
+  [13877] = 2, -- Combat, Blade Flurry
+  [14183] = 3, -- Sub, Premeditation
+  [36554] = 3, -- Sub, Shadowstep
+  -- Shaman
+  [16166] = 1, -- Ele, Elemental Mastery
+}
