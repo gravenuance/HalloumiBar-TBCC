@@ -418,7 +418,7 @@ local function zb_commands(sub_string)
 end
 
 local function zb_on_load(self)
-    print("ZakatziBar loaded. Type /zb for more info.")
+    print("|cFFFFB6C1ZakatziBar|r loaded. Type |cFFFFB6C1/zb|r for more info.")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     zb_initialize_bars()
