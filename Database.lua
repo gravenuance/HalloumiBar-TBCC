@@ -127,7 +127,7 @@ addonTable.spells_list = {
   [25446] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Starshards
   [32676] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Consume Magic
   [14751] = {durations = {180}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Inner Focus
-  [44047] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Chastise
+  [44046] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Chastise
   [2651] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Elune's Grace
   [6346] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Fear Ward
   [33206] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Pain Suppression

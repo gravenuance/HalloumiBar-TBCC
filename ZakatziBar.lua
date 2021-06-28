@@ -300,17 +300,14 @@ end
 
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
-    local spell_type, spell_name = select(12, ...)
-    local spell_id = select(7, GetSpellInfo(spell_name))
+    local spell_id, spell_name = select(12, ...)
+    --local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
-    if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) and addonTable.spells_list[spell_id] then
+    if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) then
         print(spell_id)
         print(spell_name)
         print(combat_event)
-        print(spell_type)
-        if addonTable.spells_list[spell_id] then
-            print(addonTable.spells_list[spell_id].event_type)
-        end
+        --print(spell_type)
     end
     if is_disabled then
         return
@@ -330,7 +327,7 @@ local function zb_combat_log(...)
         end
         zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
     elseif combat_event == "SWING_MISSED" then
-        zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
+        zb_handle_swing_events(spell_id, src_flags, src_guid, dst_flags, dst_guid)
     end
 end
 
