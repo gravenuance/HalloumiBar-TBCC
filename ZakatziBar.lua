@@ -268,7 +268,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             return { 2, 2 } -- friendly (dst) and friendly (src)
         end
     elseif bit.band(src_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if source is hostile
-        if bit.band(src_flags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- if source is a player
+        --if bit.band(src_flags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- if source is a player
             if bit.band(list[spell_id].trigger_groups, 4) > 0 then -- triggers when enemy casts
                 if addonTable.spells_list[spell_id].event_type == "aura" then
                     if zb_is_in_party(dst_guid) then -- if dest is in grp
@@ -279,7 +279,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
                 end
                 return { 3, 3 } -- enemy (dst) and enemy (src)
             end
-        end
+        --end
     end
     return nil
 end
