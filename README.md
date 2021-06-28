@@ -14,3 +14,4 @@ I am going to be updating the addon for TBC and WOTLK. <br />
 The most difficult feature to add in so far is the tracking of timer reduction, because it is always approximate (active and/or passive).<br />
 I am of the opinion that passive cooldown reduction is bad game design.<br />
 
+Special thanks to Bjåstad - Earthshaker and Exari - Earthshaker for helping me with testing.
