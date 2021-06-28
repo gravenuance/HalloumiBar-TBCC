@@ -57,29 +57,29 @@ addonTable.spells_list = {
   [26983] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
   -- Hunter
   [14327] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Scare Beast
-  [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Bestial Wrath - C
+  [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Bestial Wrath
   [19503] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Scatter Shot
-  [27018] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Viper Sting - C
-  [34026] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Kill Command - C
+  [27018] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Viper Sting
+  [34026] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Kill Command
   [34477] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Misdirection
   [27685] = {durations = {25}, event_type = "cast_success", trigger_groups=7}, -- Charge
   [23989] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Readiness
-  [3045] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Rapid Fire - C
+  [3045] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Rapid Fire
   [34600] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Snake Trap
   [27023] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Immolation Trap
   [27025] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 13809, duration = 24},{id = 14311, duration = 24},}}, -- Explosive Trap
   [14311] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 13809, duration = 24},}}, -- Freezing Trap
   [13809] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},}}, -- Frost Trap
-  [27022] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Volley - C
+  [27022] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Volley
   [5384] = {durations = {30}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Feign Death
   [34490] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Silencing Shot
   [27067] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Counterattack
   [19263] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Deterrence
   [27068] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Wyvern Sting
-  [27065] = {durations = {6}, event_type = "spell_damage", trigger_groups=7}, -- Aimed Shot - C
-  [1543] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Flare - C
-  [5116] = {durations = {11}, event_type = "cast_success", trigger_groups=7}, -- Concussive Shot - C
-  [19801] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Tranquilizing Shot - C
+  [27065] = {durations = {6}, event_type = "spell_damage", trigger_groups=7}, -- Aimed Shot
+  [1543] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Flare
+  [5116] = {durations = {11}, event_type = "cast_success", trigger_groups=7}, -- Concussive Shot
+  [19801] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Tranquilizing Shot
   -- Mage
   [66] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Invisibility
   [33043] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Dragon's Breath
@@ -177,33 +177,33 @@ addonTable.spells_list = {
   [30414] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
   [27275] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Soothing Kiss
   -- Warrior
-  [1161] = {durations = {420}, event_type = "cast_success", trigger_groups=7}, -- Challenging Shout - C
-  [1719] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Recklessness - C
-  [2565] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Shield Block - C
-  [5246] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Intimidating Shout - C
-  [2687] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Bloodrage -- C
-  [12328] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Sweeping Strikes - C
-  [25275] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Intercept - C
-  [676] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Disarm - C
-  [29704] = {durations = {12}, event_type = "spell_damage", trigger_groups=7}, -- Shield Bash -- C
-  [23920] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Spell Reflection -- C
-  [871] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Shield Wall -- C
-  [3411] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Intervene - C
-  [1680] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Whirlwind - C
-  [6554] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Pummel - C
-  [18499] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Berserker Rage - C
-  [355] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Taunt -- C
-  [11578] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Charge - C
-  [25264] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Thunderclap - C
-  [12292] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Death Wish - C
-  [30335] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Bloodthirst - C
-  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam - C
+  [1161] = {durations = {420}, event_type = "cast_success", trigger_groups=7}, -- Challenging Shout
+  [1719] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Recklessness
+  [2565] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Shield Block
+  [5246] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Intimidating Shout
+  [2687] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Bloodrage
+  [12328] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Sweeping Strikes
+  [25275] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Intercept
+  [676] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Disarm
+  [29704] = {durations = {12}, event_type = "spell_damage", trigger_groups=7}, -- Shield Bash
+  [23920] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Spell Reflection
+  [871] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Shield Wall
+  [3411] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Intervene
+  [1680] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Whirlwind
+  [6554] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Pummel
+  [18499] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Berserker Rage
+  [355] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Taunt
+  [11578] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Charge
+  [25264] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Thunderclap
+  [12292] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Death Wish
+  [30335] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Bloodthirst
+  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam
   [12975] = {durations = {480}, event_type = "cast_success", trigger_groups=7}, -- Last Stand
   [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Revenge
-  [30330] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Mortal Strike - C
-  [12809] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Concussion Blow - C
-  [20230] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Retaliation - C
-  [25266] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Mocking Blow - C
+  [30330] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Mortal Strike
+  [12809] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Concussion Blow
+  [20230] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Retaliation
+  [25266] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Mocking Blow
   [11585] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Overpower
 }
 
