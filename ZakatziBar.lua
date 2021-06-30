@@ -169,7 +169,7 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     end
     local get_time = GetTime()
     local cooldown = get_time-count_delay_from_start + duration
-    if (related_spell and related_spell.is_unique == true) or (list[id] and list[id].is_unique == true) then
+    if (related_spell and related_spell.is_not_unique == (false or nil)) or (list[id] and list[id].is_not_unique == (false or nil)) then
         zb_remove_all_from_src(id, src_guid, cooldown)
     end
     active_spells[key] = {}
