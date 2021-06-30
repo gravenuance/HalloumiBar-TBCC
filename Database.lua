@@ -197,9 +197,9 @@ addonTable.spells_list = {
   [25264] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Thunderclap
   [12292] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Death Wish
   [30335] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Bloodthirst
-  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam
+  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam - 
   [12975] = {durations = {480}, event_type = "cast_success", trigger_groups=7}, -- Last Stand
-  [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Revenge
+  [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Revenge -
   [30330] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Mortal Strike
   [12809] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Concussion Blow
   [20230] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Retaliation
