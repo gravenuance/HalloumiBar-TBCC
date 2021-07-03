@@ -213,7 +213,7 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
             return
         end
     else
-        if combat_event == "SPELL_DAMAGE" and addonTable.spells_list[id].event_type == "spell_damage"  then
+        if (combat_event == "SPELL_DAMAGE" or combat_event == "SPELL_MISSED") and addonTable.spells_list[id].event_type == "spell_damage"  then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_CAST_SUCCESS" and addonTable.spells_list[id].event_type == "cast_success" then

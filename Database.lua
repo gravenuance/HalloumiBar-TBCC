@@ -175,6 +175,7 @@ addonTable.spells_list = {
   [19647] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Spell Lock
   [30546] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Shadowburn
   [30414] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
+  [30413] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
   [27275] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Soothing Kiss
   -- Warrior
   [1161] = {durations = {420}, event_type = "cast_success", trigger_groups=7}, -- Challenging Shout
