@@ -171,11 +171,10 @@ addonTable.spells_list = {
   [33703] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Suffering
   [18288] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Amplify Curse
   [27223] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Death Coil
-  [17928] = {durations = {40}, event_type = "spell_damage", trigger_groups=7}, -- Howl of Terror - SPELL_CAST_START WON'T WORK
+  [17928] = {durations = {40}, event_type = "cast_success", trigger_groups=7}, -- Howl of Terror
   [19647] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Spell Lock
   [30546] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Shadowburn
-  [30414] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
-  [30413] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
+  [30414] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Shadowfury
   [27275] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Soothing Kiss
   -- Warrior
   [1161] = {durations = {420}, event_type = "cast_success", trigger_groups=7}, -- Challenging Shout
