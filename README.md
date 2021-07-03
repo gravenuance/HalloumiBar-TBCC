@@ -15,6 +15,9 @@ The most difficult feature to add in so far is the tracking of timer reduction, 
 I am of the opinion that passive cooldown reduction is bad game design.<br />
 
 Special Thanks:
+
 Bjåstad@Earthshaker
+
 Exari@Earthshaker
+
 Kesopriest@Earthshaker
