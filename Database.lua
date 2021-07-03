@@ -108,7 +108,7 @@ addonTable.spells_list = {
   [35395] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Crusader Strike
   [31842] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Divine Illumination
   [1020] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Divine Shield
-  [27139] = {durations = {60}, event_type = "spell_damage", trigger_groups=7}, -- Holy Wrath SPELL_CAST_START
+  [27139] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Holy Wrath
   [27138] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Exorcism
   [20216] = {durations = {120}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Divine Favor
   [27173] = {durations = {8}, event_type = "cast_success", trigger_groups=7}, -- Consecration
