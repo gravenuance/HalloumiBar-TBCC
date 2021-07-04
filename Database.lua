@@ -16,8 +16,8 @@ addonTable.spells_list = {
   --[11285] = {durations = {5}, event_type = "cast_success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
   [14185] = {durations = {600}, event_type = "cast_success", trigger_groups=7, spells_that_are_removed_from_cooldown={14177, 36554, 11305, 26889, 14183, 26669}}, -- Preparation
-  [38764] = {durations = {9}, event_type = "spell_damage", trigger_groups=7}, -- Gouge
-  [38768] = {durations = {10}, event_type = "spell_damage", trigger_groups=7}, -- Kick
+  [38764] = {durations = {9}, event_type = "cast_success", trigger_groups=7}, -- Gouge
+  [38768] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Kick
   [1725] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Distract
   [27448] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Feint
   [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Kidney Shot
@@ -25,9 +25,9 @@ addonTable.spells_list = {
   [11305] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Sprint
   [1787] = {durations = {5}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Stealth
   [26889] = {durations = {360}, event_type = "cast_success", trigger_groups=7}, -- Vanish
-  [14251] = {durations = {6}, event_type = "spell_damage", trigger_groups=7}, -- Riposte
+  [14251] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Riposte
   [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Blade Flurry
-  [14278] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Ghostly Strike
+  [14278] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Ghostly Strike
   [2094] = {durations = {90}, event_type = "cast_success", trigger_groups=7}, -- Blind
   [14183] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Premeditation
   [26669] = {durations = {210}, event_type = "cast_success", trigger_groups=7}, -- Evasion
@@ -45,9 +45,9 @@ addonTable.spells_list = {
   [33831] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Force of Nature
   [33987] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Mangle (Bear)
   [16979] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Feral Charge
-  [27047] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Growl
+  [6795] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Growl
   [18562] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Swiftmend
-  [27012] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Hurricane
+  [17402] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Hurricane
   [27011] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Faerie Fire (Feral)
   [29166] = {durations = {360}, event_type = "cast_success", trigger_groups=7}, -- Innervate
   [27009] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Nature's Grasp
@@ -205,6 +205,8 @@ addonTable.spells_list = {
   [20230] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Retaliation
   [25266] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Mocking Blow
   [11585] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Overpower
+  -- Human
+  [20600] = {duration = 180, event_type = "cast_success", trigger_groups=7}, -- Perception
 }
 
 addonTable.swing_spells = {}
