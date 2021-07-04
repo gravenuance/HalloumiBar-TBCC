@@ -21,3 +21,5 @@ Bjåstad@Earthshaker
 Exari@Earthshaker
 
 Kesopriest@Earthshaker
+
+Copium@Earthshaker
