@@ -54,7 +54,7 @@ addonTable.spells_list = {
   [17116] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Nature's Swiftness
   [26994] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Rebirth
   [22812] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Barkskin
-  [26983] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
+  [44206] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
   -- Hunter
   [14327] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Scare Beast
   [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Bestial Wrath
