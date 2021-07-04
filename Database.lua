@@ -1,11 +1,6 @@
 local addonName, addonTable = ...
 
-local wow_version = select(4, GetBuildInfo())
---print(wow_version)
-local calc_version_uno = math.floor(wow_version/20000)
-local calc_version_dos = wow_version%20000
---print(calc_version_uno ~= 1 or calc_version_dos > 10000)
-if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
+if (not WOW_PROJECT_BURNING_CRUSADE_CLASSIC == 5) then return end
 
 -- a quick guide to the variable "trigger_groups"
 -- when a spell is in the list, if it is cast, it will always be evaluated
