@@ -301,13 +301,11 @@ end
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_id, spell_name = select(12, ...)
-    --local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
     if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) then
         print(spell_id)
         print(spell_name)
         print(combat_event)
-        --print(spell_type)
     end
     if is_disabled then
         return
