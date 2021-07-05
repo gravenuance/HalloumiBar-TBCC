@@ -22,15 +22,15 @@ addonTable.spells_list = {
   [27448] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Feint
   [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Kidney Shot
   [36554] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Shadowstep
-  [11305] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Sprint
-  [1787] = {durations = {5}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Stealth
-  [26889] = {durations = {360}, event_type = "cast_success", trigger_groups=7}, -- Vanish
+  [11305] = {durations = {300, 210, 300}, event_type = "cast_success", trigger_groups=7}, -- Sprint
+  [1787] = {durations = {5, 10, 5}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Stealth
+  [26889] = {durations = {210, 300, 210}, event_type = "cast_success", trigger_groups=7}, -- Vanish
   [14251] = {durations = {6}, event_type = "spell_damage", trigger_groups=7}, -- Riposte
   [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Blade Flurry
   [14278] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Ghostly Strike
-  [2094] = {durations = {90}, event_type = "cast_success", trigger_groups=7}, -- Blind
+  [2094] = {durations = {90, 180, 90}, event_type = "cast_success", trigger_groups=7}, -- Blind
   [14183] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Premeditation
-  [26669] = {durations = {210}, event_type = "cast_success", trigger_groups=7}, -- Evasion
+  [26669] = {durations = {300, 210, 300}, event_type = "cast_success", trigger_groups=7}, -- Evasion
   [14177] = {durations = {180}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Cold Blood
   [31224] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Cloak of Shadows
   [13750] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Adrenaline Rush
@@ -64,7 +64,7 @@ addonTable.spells_list = {
   [34477] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Misdirection
   [27685] = {durations = {25}, event_type = "cast_success", trigger_groups=7}, -- Charge
   [23989] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Readiness
-  [3045] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Rapid Fire
+  [3045] = {durations = {300, 180, 300}, event_type = "cast_success", trigger_groups=7}, -- Rapid Fire
   [34600] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Snake Trap
   [27023] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 34600, duration = 24},{id = 27025, duration = 24},{id = 14311, duration = 24},{id = 13809, duration = 24},}}, -- Immolation Trap
   [27025] = {durations = {24}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, duration = 24},{id = 34600, duration = 24},{id = 13809, duration = 24},{id = 14311, duration = 24},}}, -- Explosive Trap
@@ -87,14 +87,14 @@ addonTable.spells_list = {
   [27128] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Fireward
   [11129] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Combustion
   [12472] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Icy Veins
-  [45438] = {durations = {240}, event_type = "cast_success", trigger_groups=7}, -- Ice block
-  [27088] = {durations = {21}, event_type = "cast_success", trigger_groups=7}, -- Frost Nova
+  [45438] = {durations = {300, 300, 240}, event_type = "cast_success", trigger_groups=7}, -- Ice block
+  [27088] = {durations = {25, 25, 21}, event_type = "cast_success", trigger_groups=7}, -- Frost Nova
   [32796] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Frost Ward
-  [27087] = {durations = {8}, event_type = "cast_success", trigger_groups=7}, -- Cone of Cold
+  [27087] = {durations = {10, 10, 8}, event_type = "cast_success", trigger_groups=7}, -- Cone of Cold
   [2139] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Counterspell
   [31687] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Summon Water Elemental
-  [11958] = {durations = {384}, event_type = "cast_success", trigger_groups=7, spells_that_are_removed_from_cooldown={27087, 32796, 27088, 45438, 12472, 31687, 33405}}, -- Cold Snap
-  [33405] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Ice Barrier
+  [11958] = {durations = {480, 480, 384}, event_type = "cast_success", trigger_groups=7, spells_that_are_removed_from_cooldown={27087, 32796, 27088, 45438, 12472, 31687, 33405}}, -- Cold Snap
+  [33405] = {durations = {30, 30, 24}, event_type = "cast_success", trigger_groups=7}, -- Ice Barrier
   [33933] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Blast Wave
   [12043] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Presence of Mind
   [12042] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Arcane Power
@@ -107,7 +107,7 @@ addonTable.spells_list = {
   [27179] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Holy Shield
   [35395] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Crusader Strike
   [31842] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Divine Illumination
-  [1020] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Divine Shield
+  [1020] = {durations = {300, 240, 300}, event_type = "cast_success", trigger_groups=7}, -- Divine Shield
   [27139] = {durations = {60}, event_type = "spell_damage", trigger_groups=7}, -- Holy Wrath SPELL_CAST_START
   [27138] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Exorcism
   [20216] = {durations = {120}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Divine Favor
@@ -115,9 +115,9 @@ addonTable.spells_list = {
   [27154] = {durations = {2400}, event_type = "cast_success", trigger_groups=7}, -- Lay on Hands
   [20066] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Repentance
   [5573] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Divine Protection
-  [20271] = {durations = {8}, event_type = "cast_success", trigger_groups=7}, -- Judgement
-  [10308] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Hammer of Justice
-  [10278] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Blessing of Protection
+  [20271] = {durations = {10, 8, 8}, event_type = "cast_success", trigger_groups=7}, -- Judgement
+  [10308] = {durations = {45, 45, 45}, event_type = "cast_success", trigger_groups=7}, -- Hammer of Justice
+  [10278] = {durations = {180, 180, 180}, event_type = "cast_success", trigger_groups=7}, -- Blessing of Protection
   [27148] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Blessing of Sacrifice
   [1044] = {durations = {25}, event_type = "cast_success", trigger_groups=7}, -- Blessing of Freedom
   [33072] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Holy Shock
@@ -137,11 +137,11 @@ addonTable.spells_list = {
   [25437] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Desperate Prayer
   [28275] = {durations = {360}, event_type = "cast_success", trigger_groups=7}, -- Lightwell
   [32548] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Symbol of Hope
-  [25429] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Fade
+  [25429] = {durations = {30, 30, 24}, event_type = "cast_success", trigger_groups=7}, -- Fade
   [25467] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Devouring Plague
   [32996] = {durations = {12}, event_type = "cast_success", trigger_groups=7}, -- Shadow Word: Death
   [15487] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Silence
-  [10890] = {durations = {26}, event_type = "cast_success", trigger_groups=7}, -- Psychic Scream
+  [10890] = {durations = {30, 30, 26}, event_type = "cast_success", trigger_groups=7}, -- Psychic Scream
   [25441] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Feedback
   [34433] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Shadowfiend
   [15286] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Vampiric Embrace
