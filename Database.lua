@@ -1,11 +1,6 @@
 local addonName, addonTable = ...
 
-local wow_version = select(4, GetBuildInfo())
---print(wow_version)
-local calc_version_uno = math.floor(wow_version/20000)
-local calc_version_dos = wow_version%20000
---print(calc_version_uno ~= 1 or calc_version_dos > 10000)
-if (calc_version_uno ~= 1 or calc_version_dos > 10000) then return end
+if (not WOW_PROJECT_BURNING_CRUSADE_CLASSIC == 5) then return end
 
 -- a quick guide to the variable "trigger_groups"
 -- when a spell is in the list, if it is cast, it will always be evaluated
@@ -16,8 +11,8 @@ addonTable.spells_list = {
   --[11285] = {durations = {5}, event_type = "cast_success", who=7, spells_that_also_go_on_cooldown = { {id = 20473, duration = 7.6}}}, -- DEV_ITEM
   -- Rogue
   [14185] = {durations = {600}, event_type = "cast_success", trigger_groups=7, spells_that_are_removed_from_cooldown={14177, 36554, 11305, 26889, 14183, 26669}}, -- Preparation
-  [38764] = {durations = {9}, event_type = "spell_damage", trigger_groups=7}, -- Gouge
-  [38768] = {durations = {10}, event_type = "spell_damage", trigger_groups=7}, -- Kick
+  [38764] = {durations = {9}, event_type = "cast_success", trigger_groups=7}, -- Gouge
+  [38768] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Kick
   [1725] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Distract
   [27448] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Feint
   [8643] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Kidney Shot
@@ -25,9 +20,9 @@ addonTable.spells_list = {
   [11305] = {durations = {300, 210, 300}, event_type = "cast_success", trigger_groups=7}, -- Sprint
   [1787] = {durations = {5, 10, 5}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Stealth
   [26889] = {durations = {210, 300, 210}, event_type = "cast_success", trigger_groups=7}, -- Vanish
-  [14251] = {durations = {6}, event_type = "spell_damage", trigger_groups=7}, -- Riposte
+  [14251] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Riposte
   [13877] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Blade Flurry
-  [14278] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Ghostly Strike
+  [14278] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Ghostly Strike
   [2094] = {durations = {90, 180, 90}, event_type = "cast_success", trigger_groups=7}, -- Blind
   [14183] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Premeditation
   [26669] = {durations = {300, 210, 300}, event_type = "cast_success", trigger_groups=7}, -- Evasion
@@ -45,16 +40,16 @@ addonTable.spells_list = {
   [33831] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Force of Nature
   [33987] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Mangle (Bear)
   [16979] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Feral Charge
-  [27047] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Growl
+  [6795] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Growl
   [18562] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Swiftmend
-  [27012] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Hurricane
+  [17402] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Hurricane
   [27011] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Faerie Fire (Feral)
   [29166] = {durations = {360}, event_type = "cast_success", trigger_groups=7}, -- Innervate
   [27009] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Nature's Grasp
   [17116] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Nature's Swiftness
   [26994] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Rebirth
   [22812] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Barkskin
-  [26983] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
+  [9862] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
   -- Hunter
   [14327] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Scare Beast
   [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Bestial Wrath
@@ -108,7 +103,7 @@ addonTable.spells_list = {
   [35395] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Crusader Strike
   [31842] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Divine Illumination
   [1020] = {durations = {300, 240, 300}, event_type = "cast_success", trigger_groups=7}, -- Divine Shield
-  [27139] = {durations = {60}, event_type = "spell_damage", trigger_groups=7}, -- Holy Wrath SPELL_CAST_START
+  [27139] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Holy Wrath SPELL_CAST_START
   [27138] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Exorcism
   [20216] = {durations = {120}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Divine Favor
   [27173] = {durations = {8}, event_type = "cast_success", trigger_groups=7}, -- Consecration
@@ -171,10 +166,10 @@ addonTable.spells_list = {
   [33703] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Suffering
   [18288] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Amplify Curse
   [27223] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Death Coil
-  [17928] = {durations = {40}, event_type = "spell_damage", trigger_groups=7}, -- Howl of Terror - SPELL_CAST_START WON'T WORK
+  [17928] = {durations = {40}, event_type = "cast_success", trigger_groups=7}, -- Howl of Terror
   [19647] = {durations = {24}, event_type = "cast_success", trigger_groups=7}, -- Spell Lock
   [30546] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Shadowburn
-  [30414] = {durations = {20}, event_type = "spell_damage", trigger_groups=7}, -- Shadowfury - SPELL_CAST_START WON'T WORK
+  [30414] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Shadowfury
   [27275] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Soothing Kiss
   -- Warrior
   [1161] = {durations = {420}, event_type = "cast_success", trigger_groups=7}, -- Challenging Shout
@@ -197,14 +192,16 @@ addonTable.spells_list = {
   [25264] = {durations = {4}, event_type = "cast_success", trigger_groups=7}, -- Thunderclap
   [12292] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Death Wish
   [30335] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Bloodthirst
-  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam
+  [30356] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Shield Slam - 
   [12975] = {durations = {480}, event_type = "cast_success", trigger_groups=7}, -- Last Stand
-  [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Revenge
+  [30357] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Revenge -
   [30330] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Mortal Strike
   [12809] = {durations = {45}, event_type = "cast_success", trigger_groups=7}, -- Concussion Blow
   [20230] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Retaliation
   [25266] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Mocking Blow
   [11585] = {durations = {5}, event_type = "cast_success", trigger_groups=7}, -- Overpower
+  -- Human
+  [20600] = {duration = 180, event_type = "cast_success", trigger_groups=7}, -- Perception
 }
 
 addonTable.swing_spells = {}

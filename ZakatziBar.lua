@@ -213,7 +213,7 @@ local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
             return
         end
     else
-        if combat_event == "SPELL_DAMAGE" and addonTable.spells_list[id].event_type == "spell_damage"  then
+        if (combat_event == "SPELL_DAMAGE" or combat_event == "SPELL_MISSED") and addonTable.spells_list[id].event_type == "spell_damage"  then
             zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_CAST_SUCCESS" and addonTable.spells_list[id].event_type == "cast_success" then
@@ -249,20 +249,20 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
         if bit.band(list[spell_id].trigger_groups, 1) > 0 then -- triggers when i cast
             if addonTable.spells_list[spell_id].event_type == "aura" then
                 if zb_is_in_party(dst_guid) then -- destination is in grp
-                    return { 2, 1 } -- friendly (dst) and self bar (src)
+                    return { 2, 3 } -- friendly (dst) and self bar (src)
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
-                    return { 3, 1 } -- enemy (dst) and self bar (src)
+                    return { 1, 3 } -- enemy (dst) and self bar (src)
                 end
             end
-            return { 1, 1 } -- self (dst) and self (src)
+            return { 3, 3 } -- self (dst) and self (src)
         end
     elseif zb_is_in_party(src_guid) then -- source is in grp
         if bit.band(list[spell_id].trigger_groups, 2) > 0 then -- triggers when grp casts
             if addonTable.spells_list[spell_id].event_type == "aura" then
                 if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if destination is enemy
-                    return { 3, 2 } -- enemy (dst) and friendly (src)
+                    return { 1, 2 } -- enemy (dst) and friendly (src)
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if destination is me
-                    return { 1, 2 } -- self (dst) and friendly (src)
+                    return { 3, 2 } -- self (dst) and friendly (src)
                 end
             end
             return { 2, 2 } -- friendly (dst) and friendly (src)
@@ -272,12 +272,12 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             if bit.band(list[spell_id].trigger_groups, 4) > 0 then -- triggers when enemy casts
                 if addonTable.spells_list[spell_id].event_type == "aura" then
                     if zb_is_in_party(dst_guid) then -- if dest is in grp
-                        return { 2, 3 } -- friendly (dst) and enemy (src)
+                        return { 2, 1 } -- friendly (dst) and enemy (src)
                     elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if dest is me
-                        return { 1, 3 } -- self (dst) and enemy (src)
+                        return { 3, 1 } -- self (dst) and enemy (src)
                     end
                 end
-                return { 3, 3 } -- enemy (dst) and enemy (src)
+                return { 1, 1 } -- enemy (dst) and enemy (src)
             end
         end
     end
@@ -301,13 +301,11 @@ end
 local function zb_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_id, spell_name = select(12, ...)
-    --local spell_id = select(7, GetSpellInfo(spell_name))
     count_delay_from_start = GetTime()
     if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) then
         print(spell_id)
         print(spell_name)
         print(combat_event)
-        --print(spell_type)
     end
     if is_disabled then
         return
