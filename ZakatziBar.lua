@@ -319,8 +319,8 @@ local function zb_combat_log(...)
             return
         end
         if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
-            for related_id in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
-                zb_remove_all_from_src(related_id, src_guid)
+            for key, value in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
+                zb_remove_all_from_src(value, src_guid)
             end
         end
         zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
