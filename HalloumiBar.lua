@@ -299,7 +299,7 @@ local function ha_handle_swing_events(spell_type, src_flags, src_guid, dst_flags
 end
 
 local function ha_combat_log(...)
-    local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
+    local _, combat_event, _, src_guid, _, src_flags, _, dst_guid, _, dst_flags, _ = ...
     local spell_id, spell_name = select(12, ...)
     count_delay_from_start = GetTime()
     if is_debugging and ((src_guid == player_guid or src_guid == UnitGUID("target"))) then
