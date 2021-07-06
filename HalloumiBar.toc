@@ -1,0 +1,10 @@
+## Interface: 20501
+## Title: |cFFFFB6C1HalloumiBar|r
+## Notes: Inspired by InterruptBar and TellMeWhen
+## Author: Dramamama
+## Version: 1.3
+## DefaultState: Enabled
+
+Database.lua
+HalloumiBar.lua
+
