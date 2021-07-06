@@ -169,7 +169,7 @@ local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     end
     local get_time = GetTime()
     local cooldown = get_time-count_delay_from_start + duration
-    if (related_spell and related_spell.is_not_unique == (false or nil)) or (list[id] and list[id].is_not_unique == (false or nil)) then
+    if (related_spell ~= nil and related_spell.is_not_unique == (false or nil)) or (list[id] ~= nil and list[id].is_not_unique == (false or nil)) then
         ha_remove_all_from_src(id, src_guid, cooldown)
     end
     active_spells[key] = {}
@@ -182,7 +182,7 @@ local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
         active_spells[key].event_type = "DEV_TYPE"
     else
         active_spells[key].event_type = list[id].event_type
-        if list[id].has_charges then
+        if list[id].has_charges ~= nil then
             active_spells[key].has_charges = list[id].has_charges - 1
             active_spells[key].max_charges = list[id].has_charges
         end
@@ -310,15 +310,15 @@ local function ha_combat_log(...)
     if is_disabled then
         return
     end
-    if addonTable.spells_list[spell_id] and addonTable.spells_list[spell_id].is_special_spell then
+    if addonTable.spells_list[spell_id] ~= nil and addonTable.spells_list[spell_id].is_special_spell then
         specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
-    if addonTable.spells_list[spell_id] then
+    if addonTable.spells_list[spell_id] ~= nil then
         local bar_index = ha_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
         if bar_index == nil then
             return
         end
-        if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
+        if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown ~= nil then
             for key, value in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
                 ha_remove_all_from_src(value, src_guid)
             end
