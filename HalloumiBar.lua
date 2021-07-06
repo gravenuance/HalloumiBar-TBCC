@@ -37,7 +37,7 @@ local is_disabled = false
 local active_spells = {}
 
 -- i made it look so weird but it just updates text
-local function zb_update_text(bar_index, button_index, cooldown)
+local function ha_update_text(bar_index, button_index, cooldown)
     bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
     if (cooldown >= 10) then
         bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
@@ -52,7 +52,7 @@ local function zb_update_text(bar_index, button_index, cooldown)
     end
 end
 
-local function zb_get_duration(value)
+local function ha_get_duration(value)
     if not value.duration == nil then
         return value.duration -- if only one duration present, use this
     end
@@ -66,7 +66,7 @@ local function zb_get_duration(value)
     end
 end
 
-local function zb_remove(id, src_guid, dst_guid)
+local function ha_remove(id, src_guid, dst_guid)
     local key = id .. "_" .. src_guid .. "_" .. dst_guid
     if active_spells[key] and active_spells[key].button_index then
         local index = active_spells[key].button_index
@@ -75,7 +75,7 @@ local function zb_remove(id, src_guid, dst_guid)
             bars[jndex][index].key = bars[jndex][index+1].key
             local next_value = active_spells[bars[jndex][index].key]
             if next_value then
-                bars[jndex][index].cd:SetCooldown(next_value.start,zb_get_duration(next_value))
+                bars[jndex][index].cd:SetCooldown(next_value.start,ha_get_duration(next_value))
                 active_spells[bars[jndex][index].key].button_index = index
             end
             bars[jndex][index].texture:SetTexture(bars[jndex][index+1].texture:GetTexture())
@@ -91,7 +91,7 @@ local function zb_remove(id, src_guid, dst_guid)
     active_spells[key] = nil
 end
 
-local function zb_add_icon(key, value, duration)
+local function ha_add_icon(key, value, duration)
     local bar_index = value.bar_index[1]
     if bars[bar_index].length <= total_icons_per_bar then
         local index = bars[bar_index].length
@@ -101,15 +101,15 @@ local function zb_add_icon(key, value, duration)
         bars[bar_index][index].cd:SetCooldown(value.start, duration)
         bars[bar_index][index]:Show()
         bars[bar_index].length = bars[bar_index].length + 1
-        zb_update_text(bar_index, index, value.cooldown)
+        ha_update_text(bar_index, index, value.cooldown)
         active_spells[key].button_index = index
     end
 end
 
-local function zb_update_cooldowns()
+local function ha_update_cooldowns()
     for key, value in pairs(active_spells) do
         local get_time = GetTime()
-        local duration = zb_get_duration(value)
+        local duration = ha_get_duration(value)
         active_spells[key].cooldown = value.start + duration - get_time
         if(active_spells[key].cooldown <= 0) then
             if value.has_charges and value.has_charges < value.max_charges then -- this is a retail thing
@@ -118,59 +118,59 @@ local function zb_update_cooldowns()
                 active_spells[key].cooldown = duration
                 if value.button_index then
                     bars[value.bar_index][value.button_index].cd:SetCooldown(get_time, duration)
-                    zb_update_text(value.bar_index, value.button_index, duration)
+                    ha_update_text(value.bar_index, value.button_index, duration)
                 end
             else
-                zb_remove(value.id, value.src_guid, value.dst_guid)
+                ha_remove(value.id, value.src_guid, value.dst_guid)
             end
         elseif value.button_index then
-            zb_update_text(value.bar_index[1], value.button_index, active_spells[key].cooldown)
+            ha_update_text(value.bar_index[1], value.button_index, active_spells[key].cooldown)
         else
-            zb_add_icon(key, active_spells[key], duration)
+            ha_add_icon(key, active_spells[key], duration)
         end
     end
 end
 
-local function zb_on_update(self, elapsed)
+local function ha_on_update(self, elapsed)
     total_time_elapsed = total_time_elapsed + elapsed;
     if total_time_elapsed >= update_interval then
         --print(#active_spells)
         --if #active_spells == 1 then
-        --    zb_frame:SetScript("OnUpdate", nil)
+        --    ha_frame:SetScript("OnUpdate", nil)
         --    return
         --end
         --doesn't work but who cares
-        zb_update_cooldowns()
+        ha_update_cooldowns()
         total_time_elapsed = 0
     end
 
 end
 
-local function zb_remove_all_from_src(id, src_guid, cooldown)
+local function ha_remove_all_from_src(id, src_guid, cooldown)
     for key, value in pairs(active_spells) do
         if value.id == id and value.src_guid == src_guid then
             if cooldown and value.cooldown >= cooldown then
                 return false
             end
             if value.dst_guid ~= "DEV_GUID" then
-                zb_remove(id, src_guid, value.dst_guid)
+                ha_remove(id, src_guid, value.dst_guid)
             end
         end
     end
 end
 
-local function zb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
+local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     local key = id .. "_".. src_guid .. "_".. dst_guid
     local duration
     if not related_spell == nil then
         duration = related_spell.duration
     else 
-        duration = zb_get_duration(list[id])
+        duration = ha_get_duration(list[id])
     end
     local get_time = GetTime()
     local cooldown = get_time-count_delay_from_start + duration
     if (related_spell and related_spell.is_not_unique == (false or nil)) or (list[id] and list[id].is_not_unique == (false or nil)) then
-        zb_remove_all_from_src(id, src_guid, cooldown)
+        ha_remove_all_from_src(id, src_guid, cooldown)
     end
     active_spells[key] = {}
     active_spells[key].id = id
@@ -193,40 +193,40 @@ local function zb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     if related_spell == nil and list[id].spells_that_also_go_on_cooldown then
         for key, value in pairs(list[id].spells_that_also_go_on_cooldown) do
             if value.id ~= id then
-                zb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value)
+                ha_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value)
             end
         end
     end
-    zb_frame:SetScript("OnUpdate", zb_on_update)
+    ha_frame:SetScript("OnUpdate", ha_on_update)
 end
 
-local function zb_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
+local function ha_handle_event(bar_index, combat_event, id, src_guid, dst_guid)
     if addonTable.spells_list[id].event_type == "aura" then
         if combat_event == "SPELL_AURA_APPLIED" then
-            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            ha_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_AURA_REMOVED" then
-            zb_remove(id, src_guid, dst_guid)
+            ha_remove(id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_AURA_REFRESH" then
-            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            ha_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         end
     else
         if (combat_event == "SPELL_DAMAGE" or combat_event == "SPELL_MISSED") and addonTable.spells_list[id].event_type == "spell_damage"  then
-            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            ha_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_CAST_SUCCESS" and addonTable.spells_list[id].event_type == "cast_success" then
-            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            ha_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return
         elseif combat_event == "SPELL_AURA_REMOVED" and addonTable.spells_list[id].event_type == "cooldown_on_remove"  then
-            zb_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
+            ha_add(bar_index, addonTable.spells_list, id, src_guid, dst_guid)
             return    
         end
     end
 end
 
-local function zb_is_in_party(guid)
+local function ha_is_in_party(guid)
     if (not IsInRaid() and not IsInGroup()) then
         return false
     end
@@ -244,11 +244,11 @@ local function zb_is_in_party(guid)
     return false
 end
 
-local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
+local function ha_which_bar(list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
     if bit.band(src_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- i casted
         if bit.band(list[spell_id].trigger_groups, 1) > 0 then -- triggers when i cast
             if addonTable.spells_list[spell_id].event_type == "aura" then
-                if zb_is_in_party(dst_guid) then -- destination is in grp
+                if ha_is_in_party(dst_guid) then -- destination is in grp
                     return { 2, 3 } -- friendly (dst) and self bar (src)
                 elseif bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
                     return { 1, 3 } -- enemy (dst) and self bar (src)
@@ -256,7 +256,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
             end
             return { 3, 3 } -- self (dst) and self (src)
         end
-    elseif zb_is_in_party(src_guid) then -- source is in grp
+    elseif ha_is_in_party(src_guid) then -- source is in grp
         if bit.band(list[spell_id].trigger_groups, 2) > 0 then -- triggers when grp casts
             if addonTable.spells_list[spell_id].event_type == "aura" then
                 if bit.band(dst_flags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then -- if destination is enemy
@@ -271,7 +271,7 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
         if bit.band(src_flags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- if source is a player
             if bit.band(list[spell_id].trigger_groups, 4) > 0 then -- triggers when enemy casts
                 if addonTable.spells_list[spell_id].event_type == "aura" then
-                    if zb_is_in_party(dst_guid) then -- if dest is in grp
+                    if ha_is_in_party(dst_guid) then -- if dest is in grp
                         return { 2, 1 } -- friendly (dst) and enemy (src)
                     elseif bit.band(dst_flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 then -- if dest is me
                         return { 3, 1 } -- self (dst) and enemy (src)
@@ -284,13 +284,13 @@ local function zb_which_bar(list, spell_id, combat_event, src_flags, src_guid, d
     return nil
 end
 
-local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
+local function ha_handle_swing_events(spell_type, src_flags, src_guid, dst_flags, dst_guid)
     for id in pairs(addonTable.swing_spells) do
         if (addonTable.swing_spells[id].class == nil or addonTable.swing_spells[id].class == select(2, GetPlayerInfoByGUID(src_guid))) then
             for swing_type in pairs(addonTable.swing_spells[id].swing_types) do
                 if swing_type == spell_type then
-                    local bar_index = zb_which_bar(addonTable.swing_spells, id, nil, src_flags, src_guid, dst_flags, dst_guid)
-                    zb_add(bar_index, addonTable.swing_spells, id, src_guid, dst_guid)
+                    local bar_index = ha_which_bar(addonTable.swing_spells, id, nil, src_flags, src_guid, dst_flags, dst_guid)
+                    ha_add(bar_index, addonTable.swing_spells, id, src_guid, dst_guid)
                     return
                 end
             end 
@@ -298,7 +298,7 @@ local function zb_handle_swing_events(spell_type, src_flags, src_guid, dst_flags
     end
 end
 
-local function zb_combat_log(...)
+local function ha_combat_log(...)
     local timestamp, combat_event, _, src_guid, src_name, src_flags, src_raid_flags, dst_guid, dst_name, dst_flags, dst_raid_flags = ...
     local spell_id, spell_name = select(12, ...)
     count_delay_from_start = GetTime()
@@ -314,22 +314,22 @@ local function zb_combat_log(...)
         specs_by_guid_list[src_guid] = addonTable.special_spells_list[spell_id]
     end
     if addonTable.spells_list[spell_id] then
-        local bar_index = zb_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
+        local bar_index = ha_which_bar(addonTable.spells_list, spell_id, combat_event, src_flags, src_guid, dst_flags, dst_guid)
         if bar_index == nil then
             return
         end
         if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown then
             for key, value in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
-                zb_remove_all_from_src(value, src_guid)
+                ha_remove_all_from_src(value, src_guid)
             end
         end
-        zb_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
+        ha_handle_event(bar_index, combat_event, spell_id, src_guid, dst_guid)
     elseif combat_event == "SWING_MISSED" then
-        zb_handle_swing_events(spell_id, src_flags, src_guid, dst_flags, dst_guid)
+        ha_handle_swing_events(spell_id, src_flags, src_guid, dst_flags, dst_guid)
     end
 end
 
-local function zb_initialize_bars()
+local function ha_initialize_bars()
     local jndex = 1
     while jndex <= number_of_bars do
         bar = CreateFrame("Frame",nil,UIParent)
@@ -387,17 +387,17 @@ local function zb_initialize_bars()
     end   
 end
 
-local function zb_clear_spec_list()
+local function ha_clear_spec_list()
     table.wipe(specs_by_guid_list)
 end
 
-local function zb_entering_world()
+local function ha_entering_world()
     for key, value in pairs(active_spells) do
-        zb_remove(value.id, value.src_guid, value.dst_guid)
+        ha_remove(value.id, value.src_guid, value.dst_guid)
     end
 end
 
-local function zb_commands(sub_string)
+local function ha_commands(sub_string)
     if sub_string == "debug" then
         is_debugging = not is_debugging
         if is_debugging then
@@ -406,8 +406,8 @@ local function zb_commands(sub_string)
             print("Debugging off.")
         end
     elseif sub_string == "clear" then
-        zb_entering_world()
-        zb_clear_spec_list()
+        ha_entering_world()
+        ha_clear_spec_list()
     elseif sub_string == "disable" then
         is_disabled = not is_disabled
     else
@@ -415,27 +415,27 @@ local function zb_commands(sub_string)
     end
 end
 
-local function zb_on_load(self)
-    print("|cFFFFB6C1HalloumiBar|r loaded. Type |cFFFFB6C1/zb|r for more info.")
+local function ha_on_load(self)
+    print("|cFFFFB6C1HalloumiBar|r loaded. Type |cFFFFB6C1/ha|r for more info.")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    zb_initialize_bars()
-    SlashCmdList["HALLOUMIBAR"] = zb_commands
+    ha_initialize_bars()
+    SlashCmdList["HALLOUMIBAR"] = ha_commands
     SLASH_HALLOUMIBAR1 = "/ha"
 end
 
 local event_handler = {
-    ["PLAYER_LOGIN"] = function(self) zb_on_load(self) end,
-    ["PLAYER_ENTERING_WORLD"] = function(self) zb_entering_world(self) end,
-    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) zb_combat_log(CombatLogGetCurrentEventInfo()) end,
+    ["PLAYER_LOGIN"] = function(self) ha_on_load(self) end,
+    ["PLAYER_ENTERING_WORLD"] = function(self) ha_entering_world(self) end,
+    ["COMBAT_LOG_EVENT_UNFILTERED"] = function(self, ...) ha_combat_log(CombatLogGetCurrentEventInfo()) end,
 }
 
-local function zb_on_event(self,event, ...)
+local function ha_on_event(self,event, ...)
 	event_handler[event](self, event, ...)
 end
 
-if not zb_frame then 
-    CreateFrame("Frame","zb_frame",UIParent)
+if not ha_frame then 
+    CreateFrame("Frame","ha_frame",UIParent)
 end
-zb_frame:SetScript("OnEvent",zb_on_event)
-zb_frame:RegisterEvent("PLAYER_LOGIN")
+ha_frame:SetScript("OnEvent",ha_on_event)
+ha_frame:RegisterEvent("PLAYER_LOGIN")
