@@ -388,7 +388,7 @@ local function ha_initialize_bars()
 end
 
 local function ha_clear_spec_list()
-    table.wipe(specs_by_guid_list)
+    specs_by_guid_list = table.wipe(specs_by_guid_list)
 end
 
 local function ha_entering_world()
