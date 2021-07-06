@@ -53,11 +53,11 @@ local function ha_update_text(bar_index, button_index, cooldown)
 end
 
 local function ha_get_duration(value)
-    if not value.duration == nil then
+    if value.duration ~= nil then
         return value.duration -- if only one duration present, use this
     end
-    if not specs_by_guid_list[value.src_guid] == nil then -- will see if guid has spec (found thru identifying spells)
-        if not value.durations[specs_by_guid_list[value.src_guid]] == nil then
+    if specs_by_guid_list[value.src_guid] ~= nil then -- will see if guid has spec (found thru identifying spells)
+        if value.durations[specs_by_guid_list[value.src_guid]] ~= nil then
             return value.durations[specs_by_guid_list[value.src_guid]] -- and get the correct duration
         end
     end
@@ -162,7 +162,7 @@ end
 local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     local key = id .. "_".. src_guid .. "_".. dst_guid
     local duration
-    if not related_spell == nil then
+    if related_spell ~= nil then
         duration = related_spell.duration
     else 
         duration = ha_get_duration(list[id])
@@ -177,7 +177,7 @@ local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     active_spells[key].src_guid = src_guid
     active_spells[key].dst_guid = dst_guid
     active_spells[key].bar_index = bar_index
-    if not related_spell == nil then
+    if related_spell ~= nil then
         active_spells[key].duration = duration
         active_spells[key].event_type = "DEV_TYPE"
     else
