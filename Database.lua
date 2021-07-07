@@ -60,11 +60,11 @@ addonTable.spells_list = {
   [27685] = {durations = {25}, event_type = "cast_success", trigger_groups=7}, -- Charge
   [23989] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Readiness
   [3045] = {durations = {300, 180, 300}, event_type = "cast_success", trigger_groups=7}, -- Rapid Fire
-  [34600] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, durations = {26}},{id = 27025, durations = {26}},{id = 14311, durations = {26}},{id = 13809, durations = {26}},}}, -- Snake Trap
-  [27023] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 34600, durations = {26}},{id = 27025, durations = {26}},{id = 14311, durations = {26}},{id = 13809, durations = {26}},}}, -- Immolation Trap
-  [27025] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, durations = {26}},{id = 34600, durations = {26}},{id = 13809, durations = {26}},{id = 14311, durations = {26}},}}, -- Explosive Trap
-  [14311] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, durations = {26}},{id = 34600, durations = {26}},{id = 27025, durations = {26}},{id = 13809, durations = {26}},}}, -- Freezing Trap
-  [13809] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023, durations = {26}},{id = 34600, durations = {26}},{id = 27025, durations = {26}},{id = 14311, durations = {26}},}}, -- Frost Trap
+  [34600] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023},{id = 27025},{id = 14311},{id = 13809},}}, -- Snake Trap
+  [27023] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 34600},{id = 27025},{id = 14311},{id = 13809},}}, -- Immolation Trap
+  [27025] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023},{id = 34600},{id = 13809},{id = 14311},}}, -- Explosive Trap
+  [14311] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023},{id = 34600},{id = 27025},{id = 13809},}}, -- Freezing Trap
+  [13809] = {durations = {26}, event_type = "cast_success", trigger_groups=7, spells_that_also_go_on_cooldown={{id = 27023},{id = 34600},{id = 27025},{id = 14311},}}, -- Frost Trap
   [27022] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Volley
   [5384] = {durations = {30}, event_type = "cooldown_on_remove", trigger_groups=7}, -- Feign Death
   [34490] = {durations = {20}, event_type = "cast_success", trigger_groups=7}, -- Silencing Shot

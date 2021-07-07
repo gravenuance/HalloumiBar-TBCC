@@ -161,12 +161,7 @@ end
 
 local function ha_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     local key = id .. "_".. src_guid .. "_".. dst_guid
-    local duration
-    if related_spell ~= nil then
-        duration = related_spell.duration
-    else 
-        duration = ha_get_duration(list[id])
-    end
+    local duration = ha_get_duration(list[id])
     local get_time = GetTime()
     local cooldown = get_time-count_delay_from_start + duration
     if (related_spell ~= nil and related_spell.is_not_unique == (false or nil)) or (list[id] ~= nil and list[id].is_not_unique == (false or nil)) then
