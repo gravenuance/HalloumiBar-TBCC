@@ -23,7 +23,7 @@ local total_time_elapsed = 0
 
 --Player identifier
 local player_guid = UnitGUID("player")
-local player_class = select(2, UnitClass("player"))
+--local player_class = select(2, UnitClass("player"))
 
 local barX = -225
 
