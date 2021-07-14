@@ -25,11 +25,15 @@ local total_time_elapsed = 0
 local player_guid = UnitGUID("player")
 local player_class = select(2, UnitClass("player"))
 
+local barX = -225
+
+local barY = -150
+
 --Bar locations
 local bar_locations = {
-    [1] = { -225, -150 },
-    [2] = { -225, -200 },
-    [3] = { -225, -250 }
+    [1] = { barX, barY },
+    [2] = { barX, barY - 50 },
+    [3] = { barX, barY - 100 }
 }
 
 local is_disabled = false
