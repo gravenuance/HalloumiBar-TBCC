@@ -307,8 +307,19 @@ local function hb_combat_log(...)
         print(spell_name)
         print(combat_event)
     end
-
-    if is_disabled or (inInstance and (instanceType ~= "arena" or instanceType ~= "pvp" or instanceType ~= "none")) then
+    if (inInstance == (false or nil)) then
+        return
+    end
+    if (inInstance and instanceType ~= "pvp") then
+        return
+    end
+    if (inInstance and instanceType ~= "arena") then
+        return
+    end
+    if (inInstance and instanceType ~= "none") then
+        return
+    end
+    if is_disabled then
         return
     end
     if addonTable.spells_list[spell_id] ~= nil and addonTable.spells_list[spell_id].is_special_spell then
