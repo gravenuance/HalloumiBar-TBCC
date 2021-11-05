@@ -13,6 +13,7 @@ local bars = {}
 -- Delay for more accurate tracking
 local count_delay_from_start = 0
 
+local inInstance, instanceType
 -- Size of side of square
 local square_size = 30
 local font_size = floor(square_size / 2)
@@ -27,7 +28,7 @@ local player_guid = UnitGUID("player")
 
 local barX = -225
 
-local barY = -150
+local barY = -200
 
 --Bar locations
 local bar_locations = {
@@ -306,7 +307,8 @@ local function hb_combat_log(...)
         print(spell_name)
         print(combat_event)
     end
-    if is_disabled then
+
+    if is_disabled or (inInstance and (instanceType ~= "arena" or instanceType ~= "pvp" or instanceType ~= "none")) then
         return
     end
     if addonTable.spells_list[spell_id] ~= nil and addonTable.spells_list[spell_id].is_special_spell then
@@ -391,6 +393,7 @@ local function hb_clear_spec_list()
 end
 
 local function hb_entering_world()
+    inInstance, instanceType = IsInInstance()
     for key, value in pairs(active_spells) do
         hb_remove(value.id, value.src_guid, value.dst_guid)
     end
