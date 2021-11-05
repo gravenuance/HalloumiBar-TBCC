@@ -310,13 +310,7 @@ local function hb_combat_log(...)
     if (inInstance == (false or nil)) then
         return
     end
-    if (inInstance and instanceType ~= "pvp") then
-        return
-    end
-    if (inInstance and instanceType ~= "arena") then
-        return
-    end
-    if (inInstance and instanceType ~= "none") then
+    if (inInstance and instanceType ~= "pvp" and instanceType ~= "pvp" and instanceType ~= "none") then
         return
     end
     if is_disabled then
