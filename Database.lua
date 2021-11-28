@@ -50,6 +50,7 @@ addonTable.spells_list = {
   [26994] = {durations = {1200}, event_type = "cast_success", trigger_groups=7}, -- Rebirth
   [22812] = {durations = {60}, event_type = "cast_success", trigger_groups=7}, -- Barkskin
   [9862] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Tranquility
+  [37316] = {durations = {15}, event_type = "aura", trigger_groups=1}, -- Nurture
   -- Hunter
   [14327] = {durations = {30}, event_type = "cast_success", trigger_groups=7}, -- Scare Beast
   [19574] = {durations = {120}, event_type = "cast_success", trigger_groups=7}, -- Bestial Wrath
