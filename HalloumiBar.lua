@@ -69,7 +69,7 @@ local function hb_get_duration(value)
             return value.durations[specs_by_guid_list[value.src_guid]] -- and get the correct duration
         end
     end
-    for key, value in pairs(value.durations) do -- will get the first duration, not always at index 0
+    for _, value in pairs(value.durations) do -- will get the first duration, not always at index 0
         return value
     end
 end
@@ -155,7 +155,7 @@ local function hb_on_update(self, elapsed)
 end
 
 local function hb_remove_all_from_src(id, src_guid, cooldown)
-    for key, value in pairs(active_spells) do
+    for _, value in pairs(active_spells) do
         if value.id == id and value.src_guid == src_guid then
             if cooldown and value.cooldown >= cooldown then
                 return false
@@ -194,7 +194,7 @@ local function hb_add(bar_index, list, id, src_guid, dst_guid, related_spell)
     active_spells[key].start = get_time*2-count_delay_from_start
     active_spells[key].cooldown = cooldown
     if related_spell == nil and list[id].spells_that_also_go_on_cooldown then
-        for key, value in pairs(list[id].spells_that_also_go_on_cooldown) do
+        for _, value in pairs(list[id].spells_that_also_go_on_cooldown) do
             if value.id ~= id then
                 hb_add({bar_index[2], bar_index[2]}, list, value.id, src_guid, "DEV_GUID", value)
             end
@@ -328,7 +328,7 @@ local function hb_combat_log(...)
             return
         end
         if addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown ~= nil then
-            for key, value in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
+            for _, value in pairs(addonTable.spells_list[spell_id].spells_that_are_removed_from_cooldown) do
                 hb_remove_all_from_src(value, src_guid)
             end
         end
@@ -402,9 +402,18 @@ end
 
 local function hb_entering_world()
     inInstance, instanceType = IsInInstance()
-    for key, value in pairs(active_spells) do
-        hb_remove(value.id, value.src_guid, value.dst_guid)
+    if (instanceType == "arena") then 
+        for _, value in pairs(active_spells) do
+            hb_remove(value.id, value.src_guid, value.dst_guid)
+        end
+    else
+        for _, value in pairs(active_spells) do
+            if(value.src_guid ~= player_guid)then
+                hb_remove(value.id, value.src_guid, value.dst_guid)
+            end 
+        end
     end
+    
 end
 
 local function hb_commands(sub_string)
