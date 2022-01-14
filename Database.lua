@@ -36,7 +36,7 @@ addonTable.spells_list = {
   [5209] = {durations = {600}, event_type = "cast_success", trigger_groups=7}, -- Challenging Roar
   [27048] = {durations = {10}, event_type = "cast_success", trigger_groups=7}, -- Cower
   [33357] = {durations = {300}, event_type = "cast_success", trigger_groups=7}, -- Dash
-  [5229] = {durations = {60}, event_type = "cast_success", trigger_groups=1}, -- Enrage
+  [5229] = {durations = {60}, event_type = "cast_success", trigger_groups=5}, -- Enrage
   [33831] = {durations = {180}, event_type = "cast_success", trigger_groups=7}, -- Force of Nature
   [33987] = {durations = {6}, event_type = "cast_success", trigger_groups=7}, -- Mangle (Bear)
   [16979] = {durations = {15}, event_type = "cast_success", trigger_groups=7}, -- Feral Charge
