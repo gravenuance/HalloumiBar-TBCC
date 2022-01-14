@@ -15,7 +15,7 @@ local count_delay_from_start = 0
 
 local inInstance, instanceType
 -- Size of side of square
-local square_size = 30
+local square_size = 45
 local font_size = floor(square_size / 2)
 
 -- How often on_update runs
@@ -43,6 +43,9 @@ local active_spells = {}
 
 -- i made it look so weird but it just updates text
 local function hb_update_text(bar_index, button_index, cooldown)
+    if (IsAddOnLoaded("OmniCC")) then
+        return
+    end
     bars[bar_index][button_index].text:SetFont(STANDARD_TEXT_FONT,font_size,"OUTLINE")
     if (cooldown >= 10) then
         bars[bar_index][button_index].text:SetTextColor(1,1,0,1)
@@ -358,7 +361,7 @@ local function hb_initialize_bars()
             icon:SetWidth(square_size)
             icon:SetHeight(square_size)
             icon:SetPoint("CENTER",bar,"CENTER",location,0)
-            icon:SetFrameStrata("LOW")
+            icon:SetFrameStrata("MEDIUM")
             
             texture = icon:CreateTexture(nil,"BACKGROUND")
             texture:SetAllPoints()
